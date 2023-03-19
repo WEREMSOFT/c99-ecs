@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_ENTITIES 10
 
@@ -30,7 +31,7 @@ void arrayDestroy(void *array)
 
 void arrayInsertElement(ArrayHeader* _this, void* element)
 {
-	_this->data[_this->size * _this->dataTypeSize] = *element;
+	memcpy(&_this->data[_this->size * _this->dataTypeSize], element, _this->size);
 	_this->size += 1;
 
 }
@@ -45,14 +46,21 @@ typedef struct
 
 typedef struct 
 {
-	int id;
-	int x;
-	int y;
+	int Id;
 } Entity;
 
 int main()
 {
 	ArrayHeader* entities = (ArrayHeader*)arrayCreate(10, sizeof(Entity));
-	entities->data[entities->size * ]
-	printf("Hello World!!\n");
+
+	{
+		Entity e = {1};
+		arrayInsertElement(entities, &e);
+		printf("%d\n", e.Id);
+	}
+	{
+		Entity e = {2};
+		arrayInsertElement(entities, &e);
+		printf("%d\n", e.Id);
+	}
 }
