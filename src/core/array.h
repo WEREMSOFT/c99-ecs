@@ -1,10 +1,6 @@
 #ifndef __ARRAY_H__
 #define __ARRAY_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #define myMalloc malloc
 #define myFree free
 // Array
@@ -16,12 +12,13 @@ typedef struct
 	char data[1];
 } ArrayHeader;
 
-void* arrayCreate(int capacity, int dataTypeSize)
+ArrayHeader* arrayCreate(int capacity, int dataTypeSize)
 {
 	void* returnValue = myMalloc(sizeof(ArrayHeader) + capacity * dataTypeSize);
 	ArrayHeader* header = (ArrayHeader*)returnValue;
 	header->capacity = capacity;
 	header->size = 0;
+	header->dataTypeSize = dataTypeSize;
 	return returnValue;
 }
 
@@ -30,19 +27,38 @@ void arrayDestroy(void *array)
 	myFree(array);
 }
 
-void arrayInsertElement(ArrayHeader* _this, void* element)
+void arrayAddElement(ArrayHeader* _this, void* element)
 {
-	memcpy(&_this->data[_this->size * _this->dataTypeSize], element, _this->size);
-	_this->size += 1;
+	if(_this->size == _this->capacity) return;
+	typedef struct 
+	{
+		char array[_this->dataTypeSize];
+	} Pivot;
 
+	Pivot* pivot = (Pivot *)&_this->data[_this->size * _this->dataTypeSize];
+
+	*pivot = *((Pivot*)element);
+
+	_this->size += 1;
+}
+
+void* arrayGetElement(ArrayHeader* _this, int index)
+{
+	 return &_this->data[index * _this->dataTypeSize];
 }
 
 void arrayDeleteElement(ArrayHeader *_this, int elementIndex)
 {
-	char lastElement[_this->dataTypeSize];
-	memcpy(lastElement, &_this->data[_this->size * _this->dataTypeSize], _this->size);
-	memcpy(&_this->data[_this->size * _this->dataTypeSize], &_this->data[elementIndex * _this->dataTypeSize], _this->size);
-	memcpy(&_this->data[elementIndex * _this->dataTypeSize], lastElement, _this->size);
+	if(_this->size == 0) return;
+	typedef struct 
+	{
+		char array[_this->dataTypeSize];
+	} Pivot;
+
+	int lastIndex = _this->size - 1;
+	Pivot* lastElement = (Pivot *)&_this->data[lastIndex * _this->dataTypeSize];
+	*((Pivot *)&_this->data[elementIndex * _this->dataTypeSize]) = *lastElement;
+
 	_this->size--;
 }
 #endif
