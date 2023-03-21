@@ -8,14 +8,8 @@
 typedef struct 
 {
 	int Id;
+	int components[COMPONENT_COUNT];
 } Entity;
-
-Entity entityCreate()
-{
-	static int id;
-	Entity returnValue = { id++ };
-	return returnValue;
-}
 
 typedef struct
 {
@@ -23,10 +17,19 @@ typedef struct
 	ArrayHeader* components[COMPONENT_COUNT];
 } Registry;
 
+Entity entityCreate(Registry registry)
+{
+	static int id;
+	Entity returnValue = { id++ };
+	arrayAddElement(registry.entities, &returnValue);
+	return returnValue;
+}
+
 void* entityAddComponent(Entity _this, Registry registry, void* component, int componentId)
 {
 	arrayAddElement(registry.components[componentId], component);
-	return arrayGetElement(registry.components[componentId], _this.Id);
+	_this.components[componentId] = registry.components[componentId]->size - 1;
+	return arrayGetElement(registry.components[componentId], _this.components[componentId]);
 }  
 
 void* entityGetComponent(Entity _this, Registry registry, int componentId)

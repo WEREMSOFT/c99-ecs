@@ -27,7 +27,7 @@ void arrayDestroy(void *array)
 	myFree(array);
 }
 
-void arrayAddElement(ArrayHeader* _this, void* element)
+void arrayAddElement(ArrayHeader* _this, const void* element)
 {
 	if(_this->size == _this->capacity) return;
 	typedef struct 
