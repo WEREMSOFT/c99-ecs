@@ -31,7 +31,8 @@ void arrayDestroy(void *array)
 
 void* arrayAddElement(ArrayHeader* _this, const void* element)
 {
-	if(_this->size == _this->capacity) return;
+	assert(_this->size < _this->capacity && "Array run out of space. Increase capacity.");
+
 	typedef struct 
 	{
 		char array[_this->dataTypeSize];
