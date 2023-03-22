@@ -1,6 +1,8 @@
 #ifndef __ARRAY_H__
 #define __ARRAY_H__
 
+#include <assert.h>
+
 #define myMalloc malloc
 #define myFree free
 // Array
@@ -27,7 +29,7 @@ void arrayDestroy(void *array)
 	myFree(array);
 }
 
-void arrayAddElement(ArrayHeader* _this, const void* element)
+void* arrayAddElement(ArrayHeader* _this, const void* element)
 {
 	if(_this->size == _this->capacity) return;
 	typedef struct 
@@ -38,11 +40,32 @@ void arrayAddElement(ArrayHeader* _this, const void* element)
 	Pivot* pivot = (Pivot *)&_this->data[_this->size * _this->dataTypeSize];
 
 	*pivot = *((Pivot*)element);
-
 	_this->size += 1;
+
+	return pivot;
 }
 
-void* arrayGetElement(ArrayHeader* _this, int index)
+void* arrayAddElementAt(ArrayHeader* _this, const void* element, int index)
+{
+	assert(index < _this->capacity && "array out of bounds");
+
+	typedef struct 
+	{
+		char array[_this->dataTypeSize];
+	} Pivot;
+
+	Pivot* pivot = (Pivot *)&_this->data[index * _this->dataTypeSize];
+
+	*pivot = *((Pivot*)element);
+	
+	// The size of the array must be at least equal to index;
+	if(_this->size < index)
+		_this->size = index;
+
+	return pivot;
+}
+
+void* arrayGetElementAt(ArrayHeader* _this, int index)
 {
 	 return &_this->data[index * _this->dataTypeSize];
 }
