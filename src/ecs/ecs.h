@@ -1,6 +1,9 @@
 #ifndef __ECS_H__
 #define __ECS_H__
 
+#include <stdint.h>
+#include "../core/bitset.h"
+
 #ifndef MAX_ENTITIES
 #define MAX_ENTITIES 10
 #endif
@@ -15,6 +18,8 @@ typedef struct
 	ArrayHeader* entities;
 	ArrayHeader* components[COMPONENT_COUNT];
 	ArrayHeader* entity2Component[COMPONENT_COUNT];
+	ArrayHeader* entitiesPerSystem[SYSTEM_COUNT];
+	ArrayHeader* componentSignatures;
 } Registry;
 
 Entity entityCreate(Registry registry)
@@ -37,6 +42,11 @@ void* entityAddComponent(Entity _this, Registry registry, void* component, int c
 	// Register component as part of the entity
 	int componentIndex = registry.components[componentId]->size - 1;
 	arrayAddElementAt(registry.entity2Component[componentId], &componentIndex, _this.Id);
+
+	Bitset* signature = arrayGetElementAt(registry.componentSignatures, _this.Id);
+
+	*signature = bitsetSet(*signature, componentId);
+
 	// The size of the component map must be at least as big as the entities array.
 	assert(registry.entity2Component[componentId]->size >= registry.entities->size || "the size of the components is smaller than the entities array");
 	
