@@ -29,6 +29,11 @@ void arrayDestroy(void *array)
 	myFree(array);
 }
 
+void arrayClear(ArrayHeader* _this)
+{
+	_this->size = 0;
+}
+
 void* arrayAddElement(ArrayHeader* _this, const void* element)
 {
 	assert(_this->size < _this->capacity && "Array run out of space. Increase capacity.");
@@ -60,15 +65,25 @@ void* arrayAddElementAt(ArrayHeader* _this, const void* element, int index)
 	*pivot = *((Pivot*)element);
 	
 	// The size of the array must be at least equal to index;
-	if(_this->size < index)
-		_this->size = index;
+	if(_this->size - 1 < index)
+		_this->size = index + 1;
 
 	return pivot;
 }
 
 void* arrayGetElementAt(ArrayHeader* _this, int index)
 {
-	 return &_this->data[index * _this->dataTypeSize];
+	assert(index < _this->size && "arrayGetElementAt index out of bounds");
+	return &_this->data[index * _this->dataTypeSize];
+}
+
+void* arrayGetElementOrCreateAt(ArrayHeader* _this, int index)
+{
+	assert(index < _this->capacity && "arrayGetElementAtOrCreate index out of bounds");
+	if(_this->size < index + 1)
+		_this->size = index + 1;
+
+	return &_this->data[index * _this->dataTypeSize];
 }
 
 void arrayDeleteElement(ArrayHeader *_this, int elementIndex)
