@@ -1,7 +1,6 @@
 #ifndef __ECS_H__
 #define __ECS_H__
 
-#include <stdint.h>
 #include "../core/bitset.h"
 
 #ifndef MAX_ENTITIES

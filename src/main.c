@@ -40,7 +40,6 @@ typedef struct
 
 Registry registryCreate()
 {
-	// TODO 5: Create an array for every system that holds the entities of interests and is updated in the registryUpdate function at the end of the game loop
 	Registry returnValue = {0};
 	returnValue.entities = arrayCreate(MAX_ENTITIES, sizeof(Entity));
 
@@ -129,7 +128,4 @@ int main()
 			printf("velocity: %f, %f\n", rigidBody->Velocity.x, rigidBody->Velocity.y);
 		}
 	}
-
-
-
 }
