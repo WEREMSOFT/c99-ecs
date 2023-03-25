@@ -59,13 +59,17 @@ Bitset entityGetComponentSignature(Entity _this, Registry registry)
 
 void registryUpdate(Registry _this)
 {
+	for(int i = 0; i < SYSTEM_COUNT; i++)
+	{
+		arrayClear(_this.entitiesPerSystem[i]);
+	}
+
 	for(int j = 0; j < _this.entities->size; j++)
 	{
 		Entity *entity = arrayGetElementAt(_this.entities, j);
 		Bitset componentSignature = entityGetComponentSignature(*entity, _this);
 		for(int systemIndex = 0; systemIndex < SYSTEM_COUNT; systemIndex++)
 		{
-			arrayClear(_this.entitiesPerSystem[systemIndex]);
 			// if the entity match the interest signature of the system we add it to the systems entity array;
 			if(componentSignature & _this.systemInterestSignatures[systemIndex])
 			{
