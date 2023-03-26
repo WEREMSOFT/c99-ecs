@@ -5,48 +5,8 @@
 #include "core/array.h"
 #include "core/bitset.h"
 
-#define MAX_ENTITIES 10
-
-enum ComponentEnum
-{
-	COMPONENT_NONE,
-	COMPONENT_POSITION,
-	COMPONENT_RIGID_BODY,
-	COMPONENT_COUNT
-};
-
-enum SystemEnum
-{
-	SYSTEM_MOVEMENT,
-	SYSTEM_COUNT
-};
-
-#include "ecs/ecs.h"
-#include "components.h"
-
-Registry registryCreate()
-{
-	Registry returnValue = {0};
-	returnValue.entities = arrayCreate(MAX_ENTITIES, sizeof(Entity));
-
-	returnValue.componentSignatures = arrayCreate(MAX_ENTITIES, sizeof(Bitset));
-
-	returnValue.components[COMPONENT_POSITION] = arrayCreate(MAX_ENTITIES, sizeof(PositionComponent));
-	returnValue.components[COMPONENT_RIGID_BODY] = arrayCreate(MAX_ENTITIES, sizeof(RigidBodyComponent));
-
-	for(int i = 0; i < COMPONENT_COUNT; i ++)
-		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
-
-	for(int i = 0; i < SYSTEM_COUNT; i++)
-		returnValue.entitiesPerSystem[i] = arrayCreate(MAX_ENTITIES, sizeof(Entity));
-	
-	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_POSITION);
-	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_RIGID_BODY);
-
-	return returnValue;
-}
-
-#include "systems.h"
+#include <SDL2/SDL.h>
+#include <game.h>
 
 int main()
 {

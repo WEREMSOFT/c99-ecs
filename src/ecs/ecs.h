@@ -2,6 +2,7 @@
 #define __ECS_H__
 
 #include "../core/bitset.h"
+#include "../core/array.h"
 
 #ifndef MAX_ENTITIES
 #define MAX_ENTITIES 10
