@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include "assetStore.h"
 
 #define MAX_ENTITIES 10
 const int FPS = 60;
@@ -56,6 +57,7 @@ typedef struct
 	int windowHeight;
 	int millisecondsPreviousFrame;
 	bool isRunning;
+	AssetStore assetStore;
 } Game;
 
 Game gameCreate()
@@ -93,7 +95,8 @@ Game gameCreate()
 
 Game gameInit(Game _this)
 {
-// Entity 1
+	_this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, TEXTURE_TILEMAP_IMAGE, "./assets/tilemaps/jungle.png");
+	// Entity 1
 	{
 		Entity entity = entityCreate(_this.registry);
 		entityAddComponent(entity, _this.registry, &((PositionComponent){3, 4}), COMPONENT_POSITION);
@@ -143,6 +146,12 @@ void gameRender(Game _this)
 	SDL_SetRenderDrawColor(_this.renderer, 21, 21, 21, 255);
 	SDL_RenderClear(_this.renderer);
 	
+	SDL_Texture* texture = assetStoreGetTexture(_this.assetStore, TEXTURE_TILEMAP_IMAGE);
+
+	SDL_Rect srcRect = {0, 0, 100, 100};
+
+	SDL_RenderCopyEx(_this.renderer, texture, &srcRect, &srcRect, 0, NULL, false);
+
 	SDL_RenderPresent(_this.renderer);
 }
 
