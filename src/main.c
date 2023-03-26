@@ -22,21 +22,7 @@ enum SystemEnum
 };
 
 #include "ecs/ecs.h"
-
-typedef struct
-{
-	float x,y,z,w;
-} Vector;
-
-typedef struct 
-{
-	int x,y;
-} PositionComponent;
-
-typedef struct 
-{
-	Vector Velocity;
-} RigidBodyComponent;
+#include "components.h"
 
 Registry registryCreate()
 {
@@ -60,30 +46,7 @@ Registry registryCreate()
 	return returnValue;
 }
 
-void updatePositionXSystem(Entity _this, Registry registry)
-{
-	PositionComponent *position = (PositionComponent *)entityGetComponent(_this, registry, COMPONENT_POSITION);
-	position->x++;
-}
-
-ArrayHeader* systemGetEntities(int systemId, Registry registry)
-{
-	ArrayHeader* returnValue = registry.entitiesPerSystem[systemId];
-	return returnValue;
-}
-
-void movementSystem(Registry registry)
-{
-	ArrayHeader* entities = systemGetEntities(SYSTEM_MOVEMENT,  registry);
-	for(int entityPerSystemIndex = 0; entityPerSystemIndex < entities->size; entityPerSystemIndex++)
-	{
-		Entity* entity = arrayGetElementAt(entities, entityPerSystemIndex);
-		RigidBodyComponent* rigidBody = (RigidBodyComponent*)entityGetComponent(*entity, registry, COMPONENT_RIGID_BODY);
-		PositionComponent* position = (PositionComponent*)entityGetComponent(*entity, registry, COMPONENT_POSITION);
-		position->y += rigidBody->Velocity.y;
-		position->x += rigidBody->Velocity.x;
-	}
-}
+#include "systems.h"
 
 int main()
 {

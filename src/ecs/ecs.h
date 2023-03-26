@@ -78,4 +78,10 @@ void registryUpdate(Registry _this)
 	}
 }
 
+ArrayHeader* systemGetEntities(int systemId, Registry registry)
+{
+	ArrayHeader* returnValue = registry.entitiesPerSystem[systemId];
+	return returnValue;
+}
+
 #endif
