@@ -10,7 +10,7 @@ FLAGS := -Wall -Wextra -Ilibs/include
 
 TARGET := bin/main.bin
 
-all: clean $(SRC_O) $(SRC_CPP_O)
+all: clean copy_assets $(SRC_O) $(SRC_CPP_O)
 	gcc $(FLAGS_DEBUG) $(FLAGS) $(SRC_O) $(SRC_CPP_O) -o $(TARGET) $(LIBS)
 
 run: all
