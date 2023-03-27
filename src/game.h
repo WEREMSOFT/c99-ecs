@@ -104,10 +104,8 @@ void load_csv(char* filename, int rows, int cols, int matrix[][cols]) {
     int row = 0, col = 0;
 
     fp = fopen(filename, "r");
-    if (fp == NULL) {
-        printf("Error: failed to open file %s\n", filename);
-        exit(1);
-    }
+
+	assert(fp != NULL && "Error: failed to open file");
 
     while (fgets(buffer, 1024, fp) != NULL && row < rows) {
         char* token = strtok(buffer, ",");
@@ -128,7 +126,7 @@ Game gameInit(Game _this)
 	_this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, TEXTURE_TILEMAP_IMAGE, "./assets/tilemaps/jungle.png");
 
 	{
-		float scale = 2.;
+		float scale = 1.;
 		int cols = 25, rows = 20;
 		int tilemap[rows][cols];
 
