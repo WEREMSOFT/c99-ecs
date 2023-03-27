@@ -2,21 +2,23 @@
 #include <stdbool.h>
 #include "assetStore.h"
 
-#define MAX_ENTITIES 10
+#define MAX_ENTITIES 600
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
 
 enum ComponentEnum
 {
 	COMPONENT_NONE,
-	COMPONENT_POSITION,
+	COMPONENT_TRANSFORM,
 	COMPONENT_RIGID_BODY,
+	COMPONENT_SPRITE,
 	COMPONENT_COUNT
 };
 
 enum SystemEnum
 {
 	SYSTEM_MOVEMENT,
+	SYSTEM_RENDER,
 	SYSTEM_COUNT
 };
 
@@ -30,8 +32,9 @@ Registry registryCreate()
 
 	returnValue.componentSignatures = arrayCreate(MAX_ENTITIES, sizeof(Bitset));
 
-	returnValue.components[COMPONENT_POSITION] = arrayCreate(MAX_ENTITIES, sizeof(PositionComponent));
+	returnValue.components[COMPONENT_TRANSFORM] = arrayCreate(MAX_ENTITIES, sizeof(TransformComponent));
 	returnValue.components[COMPONENT_RIGID_BODY] = arrayCreate(MAX_ENTITIES, sizeof(RigidBodyComponent));
+	returnValue.components[COMPONENT_SPRITE] = arrayCreate(MAX_ENTITIES, sizeof(SpriteComponent));
 
 	for(int i = 0; i < COMPONENT_COUNT; i ++)
 		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
@@ -39,8 +42,10 @@ Registry registryCreate()
 	for(int i = 0; i < SYSTEM_COUNT; i++)
 		returnValue.entitiesPerSystem[i] = arrayCreate(MAX_ENTITIES, sizeof(Entity));
 	
-	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_POSITION);
+	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_TRANSFORM);
 	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_RIGID_BODY);
+
+	returnValue.systemInterestSignatures[SYSTEM_RENDER] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_RENDER], COMPONENT_SPRITE);
 
 	return returnValue;
 }
@@ -93,19 +98,72 @@ Game gameCreate()
 	return _this;
 }
 
+void load_csv(char* filename, int rows, int cols, int matrix[][cols]) {
+    FILE* fp;
+    char buffer[1024];
+    int row = 0, col = 0;
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Error: failed to open file %s\n", filename);
+        exit(1);
+    }
+
+    while (fgets(buffer, 1024, fp) != NULL && row < rows) {
+        char* token = strtok(buffer, ",");
+        while (token != NULL && col < cols) {
+            matrix[row][col] = atoi(token);
+            col++;
+            token = strtok(NULL, ",");
+        }
+        col = 0;
+        row++;
+    }
+
+    fclose(fp);
+}
+
 Game gameInit(Game _this)
 {
 	_this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, TEXTURE_TILEMAP_IMAGE, "./assets/tilemaps/jungle.png");
+
+	{
+		float scale = 2.;
+		int cols = 25, rows = 20;
+		int tilemap[rows][cols];
+
+		load_csv("./assets/tilemaps/jungle.map", rows, cols, tilemap);
+
+		for(int y = 0; y < rows; y++)
+		{
+			for(int x = 0; x < cols; x++)
+			{
+				Entity entity = entityCreate(_this.registry);
+				SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};;
+				SDL_Rect destRect = (SDL_Rect){ x * 32, y * 32, 32, 32 };
+				
+				SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TILEMAP_IMAGE, 32, 32, 0, srcRect.x, srcRect.y, scale);
+				spriteComponent = *(SpriteComponent*)entityAddComponent(entity, _this.registry, &spriteComponent, COMPONENT_SPRITE);
+
+				Vector2 position = {destRect.x * scale, destRect.y * scale};
+				Vector2 scaleV = {scale, scale};
+
+				TransformComponent transformComponent = {position, scaleV, 0};
+				entityAddComponent(entity, _this.registry, &transformComponent, COMPONENT_TRANSFORM);
+			}
+		}
+	}
+	return _this;
 	// Entity 1
 	{
 		Entity entity = entityCreate(_this.registry);
-		entityAddComponent(entity, _this.registry, &((PositionComponent){3, 4}), COMPONENT_POSITION);
+		entityAddComponent(entity, _this.registry, &((TransformComponent){3, 4}), COMPONENT_TRANSFORM);
 		entityAddComponent(entity, _this.registry, &((RigidBodyComponent){10., 20.}), COMPONENT_RIGID_BODY);
 	}
 	// Entity 2
 	{
 		Entity entity = entityCreate(_this.registry);
-		entityAddComponent(entity, _this.registry, &((PositionComponent){1, 2}), COMPONENT_POSITION);
+		entityAddComponent(entity, _this.registry, &((TransformComponent){1, 2}), COMPONENT_TRANSFORM);
 		entityAddComponent(entity, _this.registry, &((RigidBodyComponent){30., 40.}), COMPONENT_RIGID_BODY);
 	}
 	return _this;
@@ -145,12 +203,8 @@ void gameRender(Game _this)
 {
 	SDL_SetRenderDrawColor(_this.renderer, 21, 21, 21, 255);
 	SDL_RenderClear(_this.renderer);
-	
-	SDL_Texture* texture = assetStoreGetTexture(_this.assetStore, TEXTURE_TILEMAP_IMAGE);
 
-	SDL_Rect srcRect = {0, 0, 100, 100};
-
-	SDL_RenderCopyEx(_this.renderer, texture, &srcRect, &srcRect, 0, NULL, false);
+	renderSystem(_this.registry, _this.assetStore, _this.renderer);
 
 	SDL_RenderPresent(_this.renderer);
 }
@@ -165,31 +219,8 @@ Game gameUpdate(Game _this)
 	float deltaTime = (SDL_GetTicks() - _this.millisecondsPreviousFrame) / 1000.f;
 	_this.millisecondsPreviousFrame = SDL_GetTicks();
 
-	printf("########################################\n");
-	for(int i = 0; i < _this.registry.entities->size; i++)
-	{
-		Entity entity = *(Entity *)arrayGetElementAt(_this.registry.entities, i);
-		{
-			PositionComponent* position = entityGetComponent(entity, _this.registry, COMPONENT_POSITION);
-			printf("position: %d, %d\n", position->x, position->y);
-			RigidBodyComponent* rigidBody = entityGetComponent(entity, _this.registry, COMPONENT_RIGID_BODY);
-			printf("velocity: %f, %f\n", rigidBody->Velocity.x, rigidBody->Velocity.y);
-		}
-	}
-
 	movementSystem(_this.registry);
 
-	printf("########################################\n");
-	for(int i = 0; i < _this.registry.entities->size; i++)
-	{
-		Entity entity = *(Entity *)arrayGetElementAt(_this.registry.entities, i);
-		{
-			PositionComponent* position = entityGetComponent(entity, _this.registry, COMPONENT_POSITION);
-			printf("position: %d, %d\n", position->x, position->y);
-			RigidBodyComponent* rigidBody = entityGetComponent(entity, _this.registry, COMPONENT_RIGID_BODY);
-			printf("velocity: %f, %f\n", rigidBody->Velocity.x, rigidBody->Velocity.y);
-		}
-	}
 	registryUpdate(_this.registry);
 	return _this;
 }

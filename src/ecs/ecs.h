@@ -71,7 +71,7 @@ void registryUpdate(Registry _this)
 		for(int systemIndex = 0; systemIndex < SYSTEM_COUNT; systemIndex++)
 		{
 			// if the entity match the interest signature of the system we add it to the systems entity array;
-			if(componentSignature & _this.systemInterestSignatures[systemIndex])
+			if((componentSignature & _this.systemInterestSignatures[systemIndex]) == _this.systemInterestSignatures[systemIndex])
 			{
 				arrayAddElement(_this.entitiesPerSystem[systemIndex], entity);
 			}

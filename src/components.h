@@ -5,23 +5,33 @@ typedef struct
 	float x,y,z,w;
 } Vector;
 
+typedef struct
+{
+	float x,y;
+} Vector2;
+
+
+// POSITION
 typedef struct 
 {
-	int x,y;
-} PositionComponent;
+	Vector2 position;
+	Vector2 scale;
+	double rotation;
+} TransformComponent;
 
+// RIGIDBODY
 typedef struct 
 {
 	Vector Velocity;
 } RigidBodyComponent;
 
+// SPRITE
 typedef struct
 {
 int width;
 	int height;
 	int zIndex;
 	bool isFixed;
-
 	TextureIdEnum assetId;
 	SDL_Rect srcRect;
 	SDL_RendererFlip flip;
