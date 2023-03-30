@@ -22,6 +22,21 @@ enum SystemEnum
 	SYSTEM_COUNT
 };
 
+enum TagsEnum
+{
+	TAG_PLAYER,
+	TAG_ENEMY,
+	TAG_TILE,
+	TAG_COUNT
+};
+
+enum GroupsEnum
+{
+	GROUP_TILES,
+	GROUP_ENEMIES,
+	GROUP_COUNT
+};
+
 #include "ecs/ecs.h"
 #include "components.h"
 
@@ -31,6 +46,8 @@ Registry registryCreate()
 	returnValue.entities = arrayCreate(MAX_ENTITIES, sizeof(Entity));
 
 	returnValue.componentSignatures = arrayCreate(MAX_ENTITIES, sizeof(Bitset));
+	returnValue.tags = arrayCreateAndInitToZero(MAX_ENTITIES, sizeof(Bitset));
+	returnValue.tags->size = returnValue.tags->capacity;
 
 	returnValue.components[COMPONENT_TRANSFORM] = arrayCreate(MAX_ENTITIES, sizeof(TransformComponent));
 	returnValue.components[COMPONENT_RIGID_BODY] = arrayCreate(MAX_ENTITIES, sizeof(RigidBodyComponent));
@@ -38,6 +55,9 @@ Registry registryCreate()
 
 	for(int i = 0; i < COMPONENT_COUNT; i ++)
 		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
+
+	for(int i = 0; i < GROUP_COUNT; i++)
+		returnValue.groups[i] = arrayCreate(MAX_ENTITIES, sizeof(Entity));
 
 	for(int i = 0; i < SYSTEM_COUNT; i++)
 		returnValue.entitiesPerSystem[i] = arrayCreate(MAX_ENTITIES, sizeof(Entity));
@@ -137,6 +157,8 @@ Game gameInit(Game _this)
 			for(int x = 0; x < cols; x++)
 			{
 				Entity entity = entityCreate(_this.registry);
+				entityAddTag(entity, _this.registry, TAG_TILE);
+
 				SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};;
 				SDL_Rect destRect = (SDL_Rect){ x * 32, y * 32, 32, 32 };
 				

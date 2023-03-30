@@ -16,10 +16,12 @@ typedef struct
 typedef struct
 {
 	ArrayHeader* entities;
+	ArrayHeader* groups[GROUP_COUNT];
 	ArrayHeader* components[COMPONENT_COUNT];
 	ArrayHeader* entity2Component[COMPONENT_COUNT];
 	ArrayHeader* entitiesPerSystem[SYSTEM_COUNT];
 	ArrayHeader* componentSignatures;
+	ArrayHeader* tags;
 	Bitset systemInterestSignatures[SYSTEM_COUNT];
 } Registry;
 
@@ -34,6 +36,20 @@ void* entityGetComponent(Entity _this, Registry registry, int componentId)
 {
 	int *id = arrayGetElementAt(registry.entity2Component[componentId], _this.id);
 	return arrayGetElementAt(registry.components[componentId], *id);
+}
+
+Bitset entityAddTag(Entity _this, Registry registry, int tag)
+{
+	Bitset *returnValue = arrayGetElementAt(registry.tags, _this.id);
+	*returnValue = bitsetSet(*returnValue, tag);
+	return *returnValue;
+}
+
+bool entityHasTag(Entity _this, Registry registry, int tag)
+{
+	Bitset entityTags = 0;
+	entityTags = *(Bitset *)arrayGetElementAt(registry.tags, _this.id);
+	return bitsetIsSet(entityTags, tag);
 }
 
 void* entityAddComponent(Entity _this, Registry registry, void* component, int componentId)

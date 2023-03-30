@@ -19,11 +19,10 @@ Bitset bitsetSet(Bitset _this, int bitIndex)
 
 int bitsetIsSet(Bitset _this, int bitIndex)
 {
-	Bitset bitToSet = 1;
-	bitToSet <<= bitIndex;
+	Bitset bitToTest = 1;
+	bitToTest <<= bitIndex;
 
-	_this &= bitToSet;
-	return _this == 0;
+	return (_this & bitToTest) == bitToTest;
 }
 
 Bitset bitsetClear(Bitset _this, int bitIndex)

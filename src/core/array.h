@@ -24,6 +24,23 @@ ArrayHeader* arrayCreate(int capacity, int dataTypeSize)
 	return returnValue;
 }
 
+ArrayHeader* arrayCreateAndInitToZero(int capacity, int dataTypeSize)
+{
+	size_t size = sizeof(ArrayHeader) + capacity * dataTypeSize;
+	void* returnValue = myMalloc(size);
+	char *memToZero = returnValue;
+	for(int i = 0; i < size; i++)
+	{
+		memToZero[i] = 0;
+	}
+
+	ArrayHeader* header = (ArrayHeader*)returnValue;
+	header->capacity = capacity;
+	header->size = 0;
+	header->dataTypeSize = dataTypeSize;
+	return returnValue;
+}
+
 void arrayDestroy(void *array)
 {
 	myFree(array);
