@@ -51,9 +51,18 @@ void arrayClear(ArrayHeader* _this)
 	_this->size = 0;
 }
 
-void* arrayAddElement(ArrayHeader* _this, const void* element)
+ArrayHeader* arrayAddElement(ArrayHeader* _this, const void* element)
 {
-	assert(_this->size < _this->capacity && "Array run out of space. Increase capacity.");
+
+	if((_this->size + 1) == _this->capacity)
+	{
+		ArrayHeader* biggerArray = arrayCreate(_this->capacity * 2, _this->dataTypeSize);
+		memcpy(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
+		myFree(_this);
+		_this = biggerArray;
+	}
+
+	_this->size += 1;
 
 	typedef struct 
 	{
@@ -63,14 +72,19 @@ void* arrayAddElement(ArrayHeader* _this, const void* element)
 	Pivot* pivot = (Pivot *)&_this->data[_this->size * _this->dataTypeSize];
 
 	*pivot = *((Pivot*)element);
-	_this->size += 1;
 
-	return pivot;
+	return _this;
 }
 
-void* arrayAddElementAt(ArrayHeader* _this, const void* element, int index)
+ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int index)
 {
-	assert(index < _this->capacity && "array out of bounds");
+	if(index >= _this->capacity)
+	{
+		ArrayHeader* biggerArray = arrayCreate(index + 1, _this->dataTypeSize);
+		memcpy(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
+		myFree(_this);
+		_this = biggerArray;
+	}
 
 	typedef struct 
 	{
@@ -82,10 +96,10 @@ void* arrayAddElementAt(ArrayHeader* _this, const void* element, int index)
 	*pivot = *((Pivot*)element);
 	
 	// The size of the array must be at least equal to index;
-	if(_this->size - 1 < index)
+	if(_this->size < index)
 		_this->size = index + 1;
 
-	return pivot;
+	return _this;
 }
 
 void* arrayGetElementAt(ArrayHeader* _this, int index)
@@ -97,8 +111,8 @@ void* arrayGetElementAt(ArrayHeader* _this, int index)
 void* arrayGetElementOrCreateAt(ArrayHeader* _this, int index)
 {
 	assert(index < _this->capacity && "arrayGetElementAtOrCreate index out of bounds");
-	if(_this->size < index + 1)
-		_this->size = index + 1;
+	if(_this->size < index)
+		_this->size = index;
 
 	return &_this->data[index * _this->dataTypeSize];
 }

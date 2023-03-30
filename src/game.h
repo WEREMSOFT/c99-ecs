@@ -156,7 +156,7 @@ Game gameInit(Game _this)
 		{
 			for(int x = 0; x < cols; x++)
 			{
-				Entity entity = entityCreate(_this.registry);
+				Entity entity = entityCreate(&_this.registry);
 				entityAddTag(entity, _this.registry, TAG_TILE);
 
 				SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};;
@@ -176,13 +176,13 @@ Game gameInit(Game _this)
 	return _this;
 	// Entity 1
 	{
-		Entity entity = entityCreate(_this.registry);
+		Entity entity = entityCreate(&_this.registry);
 		entityAddComponent(entity, _this.registry, &((TransformComponent){3, 4}), COMPONENT_TRANSFORM);
 		entityAddComponent(entity, _this.registry, &((RigidBodyComponent){10., 20.}), COMPONENT_RIGID_BODY);
 	}
 	// Entity 2
 	{
-		Entity entity = entityCreate(_this.registry);
+		Entity entity = entityCreate(&_this.registry);
 		entityAddComponent(entity, _this.registry, &((TransformComponent){1, 2}), COMPONENT_TRANSFORM);
 		entityAddComponent(entity, _this.registry, &((RigidBodyComponent){30., 40.}), COMPONENT_RIGID_BODY);
 	}

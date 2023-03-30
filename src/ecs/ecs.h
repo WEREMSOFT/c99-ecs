@@ -25,10 +25,11 @@ typedef struct
 	Bitset systemInterestSignatures[SYSTEM_COUNT];
 } Registry;
 
-Entity entityCreate(Registry registry)
+Entity entityCreate(Registry* registry)
 {
-	Entity* result = arrayAddElement(registry.entities, &(Entity){0});
-	result->id = registry.entities->size - 1;
+	registry->entities = arrayAddElement(registry->entities, &(Entity){0});
+	Entity* result = arrayGetElementAt(registry->entities, registry->entities->size);
+	result->id = registry->entities->size;
 	return *result;
 }
 
@@ -101,4 +102,9 @@ ArrayHeader* systemGetEntities(int systemId, Registry registry)
 	return returnValue;
 }
 
+Registry registryAddEntityToGroup(Registry _this, Entity entity, int groupId)
+{
+	_this.groups[groupId] = arrayAddElement(_this.groups[groupId], &entity);
+	return _this;
+}
 #endif
