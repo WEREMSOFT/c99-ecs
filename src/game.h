@@ -118,7 +118,7 @@ Game gameCreate()
 	return _this;
 }
 
-void load_csv(char* filename, int rows, int cols, int matrix[][cols]) {
+static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
     FILE* fp;
     char buffer[1024];
     int row = 0, col = 0;
@@ -150,7 +150,7 @@ Game gameInit(Game _this)
 		int cols = 25, rows = 20;
 		int tilemap[rows][cols];
 
-		load_csv("./assets/tilemaps/jungle.map", rows, cols, tilemap);
+		loadCSV("./assets/tilemaps/jungle.map", rows, cols, tilemap);
 
 		for(int y = 0; y < rows; y++)
 		{
@@ -163,13 +163,13 @@ Game gameInit(Game _this)
 				SDL_Rect destRect = (SDL_Rect){ x * 32, y * 32, 32, 32 };
 				
 				SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TILEMAP_IMAGE, 32, 32, 0, srcRect.x, srcRect.y, scale);
-				spriteComponent = *(SpriteComponent*)entityAddComponent(entity, _this.registry, &spriteComponent, COMPONENT_SPRITE);
+				spriteComponent = *(SpriteComponent*)entityAddComponent(entity, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
 
 				Vector2 position = {destRect.x * scale, destRect.y * scale};
 				Vector2 scaleV = {scale, scale};
 
 				TransformComponent transformComponent = {position, scaleV, 0};
-				entityAddComponent(entity, _this.registry, &transformComponent, COMPONENT_TRANSFORM);
+				entityAddComponent(entity, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
 			}
 		}
 	}
@@ -177,14 +177,14 @@ Game gameInit(Game _this)
 	// Entity 1
 	{
 		Entity entity = entityCreate(&_this.registry);
-		entityAddComponent(entity, _this.registry, &((TransformComponent){3, 4}), COMPONENT_TRANSFORM);
-		entityAddComponent(entity, _this.registry, &((RigidBodyComponent){10., 20.}), COMPONENT_RIGID_BODY);
+		entityAddComponent(entity, &_this.registry, &((TransformComponent){3, 4}), COMPONENT_TRANSFORM);
+		entityAddComponent(entity, &_this.registry, &((RigidBodyComponent){10., 20.}), COMPONENT_RIGID_BODY);
 	}
 	// Entity 2
 	{
 		Entity entity = entityCreate(&_this.registry);
-		entityAddComponent(entity, _this.registry, &((TransformComponent){1, 2}), COMPONENT_TRANSFORM);
-		entityAddComponent(entity, _this.registry, &((RigidBodyComponent){30., 40.}), COMPONENT_RIGID_BODY);
+		entityAddComponent(entity, &_this.registry, &((TransformComponent){1, 2}), COMPONENT_TRANSFORM);
+		entityAddComponent(entity, &_this.registry, &((RigidBodyComponent){30., 40.}), COMPONENT_RIGID_BODY);
 	}
 	return _this;
 }
@@ -241,7 +241,7 @@ Game gameUpdate(Game _this)
 
 	movementSystem(_this.registry);
 
-	registryUpdate(_this.registry);
+	_this.registry = registryUpdate(_this.registry);
 	return _this;
 }
 

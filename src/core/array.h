@@ -27,13 +27,10 @@ ArrayHeader* arrayCreate(int capacity, int dataTypeSize)
 ArrayHeader* arrayCreateAndInitToZero(int capacity, int dataTypeSize)
 {
 	size_t size = sizeof(ArrayHeader) + capacity * dataTypeSize;
-	void* returnValue = myMalloc(size);
-	char *memToZero = returnValue;
-	for(int i = 0; i < size; i++)
-	{
-		memToZero[i] = 0;
-	}
+	ArrayHeader* returnValue = myMalloc(size);
 
+	memset(returnValue->data, 0, capacity * dataTypeSize);
+	
 	ArrayHeader* header = (ArrayHeader*)returnValue;
 	header->capacity = capacity;
 	header->size = 0;
@@ -54,25 +51,26 @@ void arrayClear(ArrayHeader* _this)
 ArrayHeader* arrayAddElement(ArrayHeader* _this, const void* element)
 {
 
-	if((_this->size + 1) == _this->capacity)
+	if(_this->size == _this->capacity)
 	{
 		ArrayHeader* biggerArray = arrayCreate(_this->capacity * 2, _this->dataTypeSize);
 		memcpy(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
-		myFree(_this);
+		biggerArray->size = _this->size;
+		arrayDestroy(_this);
 		_this = biggerArray;
 	}
-
-	_this->size += 1;
 
 	typedef struct 
 	{
 		char array[_this->dataTypeSize];
 	} Pivot;
 
+
 	Pivot* pivot = (Pivot *)&_this->data[_this->size * _this->dataTypeSize];
 
 	*pivot = *((Pivot*)element);
 
+	_this->size += 1;
 	return _this;
 }
 
@@ -80,10 +78,11 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 {
 	if(index >= _this->capacity)
 	{
-		ArrayHeader* biggerArray = arrayCreate(index + 1, _this->dataTypeSize);
+		ArrayHeader* biggerArray = arrayCreateAndInitToZero(index + 1, _this->dataTypeSize);
 		memcpy(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
-		myFree(_this);
+		arrayDestroy(_this);
 		_this = biggerArray;
+		_this->size = index;
 	}
 
 	typedef struct 
@@ -96,8 +95,7 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 	*pivot = *((Pivot*)element);
 	
 	// The size of the array must be at least equal to index;
-	if(_this->size < index)
-		_this->size = index + 1;
+	_this->size = index + 1;
 
 	return _this;
 }
@@ -110,16 +108,27 @@ void* arrayGetElementAt(ArrayHeader* _this, int index)
 
 void* arrayGetElementOrCreateAt(ArrayHeader* _this, int index)
 {
-	assert(index < _this->capacity && "arrayGetElementAtOrCreate index out of bounds");
-	if(_this->size < index)
-		_this->size = index;
+	typedef struct 
+	{
+		char array[_this->dataTypeSize];
+	} Pivot;
+		
+	Pivot pivot;
 
-	return &_this->data[index * _this->dataTypeSize];
+	memset(pivot.array, 0, _this->dataTypeSize);
+
+	if(index >= _this->size)
+	{
+		_this = arrayAddElementAt(_this, &pivot, index);
+	}
+
+	return arrayGetElementAt(_this, index);
 }
 
 void arrayDeleteElement(ArrayHeader *_this, int elementIndex)
 {
-	if(_this->size == 0) return;
+	if(_this->size == 0 || elementIndex >= _this->size) return;
+	
 	typedef struct 
 	{
 		char array[_this->dataTypeSize];
