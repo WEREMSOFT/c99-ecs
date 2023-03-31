@@ -4,12 +4,16 @@
 
 #include "core/array.h"
 #include "core/bitset.h"
+#include "core/logger.h"
 
 #include <SDL2/SDL.h>
 #include "game.h"
 
 int main()
 {
+
+	loggerLog("hola tarola");
+	loggerError("error tarola");
 	// ArrayHeader *array = arrayCreateAndInitToZero(2, sizeof(int));
 
 	// printf("size : %d # capacity: %d\n", array->size, array->capacity);
