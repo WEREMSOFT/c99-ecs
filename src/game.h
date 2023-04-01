@@ -143,9 +143,12 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
 Game gameInit(Game _this)
 {
 	_this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, TEXTURE_TILEMAP_IMAGE, "./assets/tilemaps/jungle.png");
+	_this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, TEXTURE_TREE_IMAGE, "./assets/images/tree.png");
+
+		float scale = 1.;
+		Vector2 scaleV = {scale, scale};
 
 	{
-		float scale = 1.;
 		int cols = 25, rows = 20;
 		int tilemap[rows][cols];
 
@@ -162,29 +165,28 @@ Game gameInit(Game _this)
 				SDL_Rect destRect = (SDL_Rect){ x * 32, y * 32, 32, 32 };
 				
 				SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TILEMAP_IMAGE, 32, 32, 0, srcRect.x, srcRect.y, scale);
-				spriteComponent = *(SpriteComponent*)entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
+				entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
 
 				Vector2 position = {destRect.x * scale, destRect.y * scale};
-				Vector2 scaleV = {scale, scale};
 
 				TransformComponent transformComponent = {position, scaleV, 0};
 				entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
 			}
 		}
 	}
-	return _this;
 	// Entity 1
 	{
 		int entityId = entityCreate(&_this.registry);
-		entityAddComponent(entityId, &_this.registry, &((TransformComponent){3, 4}), COMPONENT_TRANSFORM);
-		entityAddComponent(entityId, &_this.registry, &((RigidBodyComponent){10., 20.}), COMPONENT_RIGID_BODY);
+
+		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE_IMAGE, 16, 32, 0, 0, 0, 2.);
+		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
+		
+		TransformComponent transformComponent = {{10, 10}, scaleV, 0};
+
+		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
+		entityAddComponent(entityId, &_this.registry, &((RigidBodyComponent){0., 0.}), COMPONENT_RIGID_BODY);
 	}
-	// Entity 2
-	{
-		int entityId = entityCreate(&_this.registry);
-		entityAddComponent(entityId, &_this.registry, &((TransformComponent){1, 2}), COMPONENT_TRANSFORM);
-		entityAddComponent(entityId, &_this.registry, &((RigidBodyComponent){30., 40.}), COMPONENT_RIGID_BODY);
-	}
+
 	return _this;
 }
 
