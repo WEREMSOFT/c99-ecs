@@ -43,7 +43,6 @@ enum GroupsEnum
 Registry registryCreate()
 {
 	Registry returnValue = {0};
-	returnValue.entities = arrayCreate(MAX_ENTITIES, sizeof(Entity));
 
 	returnValue.componentSignatures = arrayCreate(MAX_ENTITIES, sizeof(Bitset));
 	returnValue.tags = arrayCreateAndInitToZero(MAX_ENTITIES, sizeof(Bitset));
@@ -57,10 +56,10 @@ Registry registryCreate()
 		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
 
 	for(int i = 0; i < GROUP_COUNT; i++)
-		returnValue.groups[i] = arrayCreate(MAX_ENTITIES, sizeof(Entity));
+		returnValue.groups[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
 
 	for(int i = 0; i < SYSTEM_COUNT; i++)
-		returnValue.entitiesPerSystem[i] = arrayCreate(MAX_ENTITIES, sizeof(Entity));
+		returnValue.entitiesPerSystem[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
 	
 	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_TRANSFORM);
 	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_RIGID_BODY);
@@ -156,35 +155,35 @@ Game gameInit(Game _this)
 		{
 			for(int x = 0; x < cols; x++)
 			{
-				Entity entity = entityCreate(&_this.registry);
-				entityAddTag(entity, _this.registry, TAG_TILE);
+				int entityId = entityCreate(&_this.registry);
+				entityAddTag(entityId, _this.registry, TAG_TILE);
 
 				SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};;
 				SDL_Rect destRect = (SDL_Rect){ x * 32, y * 32, 32, 32 };
 				
 				SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TILEMAP_IMAGE, 32, 32, 0, srcRect.x, srcRect.y, scale);
-				spriteComponent = *(SpriteComponent*)entityAddComponent(entity, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
+				spriteComponent = *(SpriteComponent*)entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
 
 				Vector2 position = {destRect.x * scale, destRect.y * scale};
 				Vector2 scaleV = {scale, scale};
 
 				TransformComponent transformComponent = {position, scaleV, 0};
-				entityAddComponent(entity, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
+				entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
 			}
 		}
 	}
 	return _this;
 	// Entity 1
 	{
-		Entity entity = entityCreate(&_this.registry);
-		entityAddComponent(entity, &_this.registry, &((TransformComponent){3, 4}), COMPONENT_TRANSFORM);
-		entityAddComponent(entity, &_this.registry, &((RigidBodyComponent){10., 20.}), COMPONENT_RIGID_BODY);
+		int entityId = entityCreate(&_this.registry);
+		entityAddComponent(entityId, &_this.registry, &((TransformComponent){3, 4}), COMPONENT_TRANSFORM);
+		entityAddComponent(entityId, &_this.registry, &((RigidBodyComponent){10., 20.}), COMPONENT_RIGID_BODY);
 	}
 	// Entity 2
 	{
-		Entity entity = entityCreate(&_this.registry);
-		entityAddComponent(entity, &_this.registry, &((TransformComponent){1, 2}), COMPONENT_TRANSFORM);
-		entityAddComponent(entity, &_this.registry, &((RigidBodyComponent){30., 40.}), COMPONENT_RIGID_BODY);
+		int entityId = entityCreate(&_this.registry);
+		entityAddComponent(entityId, &_this.registry, &((TransformComponent){1, 2}), COMPONENT_TRANSFORM);
+		entityAddComponent(entityId, &_this.registry, &((RigidBodyComponent){30., 40.}), COMPONENT_RIGID_BODY);
 	}
 	return _this;
 }

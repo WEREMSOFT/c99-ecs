@@ -8,14 +8,9 @@
 #define MAX_ENTITIES 10
 #endif
 
-typedef struct 
-{
-	int id;
-} Entity;
-
 typedef struct
 {
-	ArrayHeader* entities;
+	int entityCount;
 	ArrayHeader* groups[GROUP_COUNT];
 	ArrayHeader* components[COMPONENT_COUNT];
 	ArrayHeader* entity2Component[COMPONENT_COUNT];
@@ -25,52 +20,49 @@ typedef struct
 	Bitset systemInterestSignatures[SYSTEM_COUNT];
 } Registry;
 
-Entity entityCreate(Registry* registry)
+int entityCreate(Registry* registry)
 {
-	registry->entities = arrayAddElement(registry->entities, &(Entity){0});
-	Entity* result = arrayGetElementAt(registry->entities, registry->entities->size - 1);
-	result->id = registry->entities->size;
-	return *result;
+	return registry->entityCount++;
 }
 
-void* entityGetComponent(Entity _this, Registry registry, int componentId)
+void* entityGetComponent(int entityId, Registry registry, int componentId)
 {
-	int *id = arrayGetElementAt(registry.entity2Component[componentId], _this.id);
+	int *id = arrayGetElementAt(registry.entity2Component[componentId], entityId);
 	return arrayGetElementAt(registry.components[componentId], *id);
 }
 
-Bitset entityAddTag(Entity _this, Registry registry, int tag)
+Bitset entityAddTag(int entityId, Registry registry, int tag)
 {
-	Bitset *returnValue = arrayGetElementAt(registry.tags, _this.id);
+	Bitset *returnValue = arrayGetElementAt(registry.tags, entityId);
 	*returnValue = bitsetSet(*returnValue, tag);
 	return *returnValue;
 }
 
-bool entityHasTag(Entity _this, Registry registry, int tag)
+bool entityHasTag(int entityId, Registry registry, int tag)
 {
 	Bitset entityTags = 0;
-	entityTags = *(Bitset *)arrayGetElementAt(registry.tags, _this.id);
+	entityTags = *(Bitset *)arrayGetElementAt(registry.tags, entityId);
 	return bitsetIsSet(entityTags, tag);
 }
 
-void* entityAddComponent(Entity _this, Registry* registry, void* component, int componentId)
+void* entityAddComponent(int entityId, Registry* registry, void* component, int componentId)
 {
 	// Add component to the component array. The index of the new element is the size - 1 of the array
 	registry->components[componentId] = arrayAddElement(registry->components[componentId], component);
 	// Register component as part of the entity
 	int componentIndex = registry->components[componentId]->size - 1;
-	arrayAddElementAt(registry->entity2Component[componentId], &componentIndex, _this.id);
-	Bitset* signature = arrayGetElementOrCreateAt(registry->componentSignatures, _this.id);
+	arrayAddElementAt(registry->entity2Component[componentId], &componentIndex, entityId);
+	Bitset* signature = arrayGetElementOrCreateAt(registry->componentSignatures, entityId);
 	*signature = bitsetSet(*signature, componentId);
 	// The size of the component map must be at least as big as the entities array.
-	assert(registry->entity2Component[componentId]->size >= registry->entities->size || "the size of the components is smaller than the entities array");
-	return entityGetComponent(_this, *registry, componentId);
+	assert(registry->entity2Component[componentId]->size >= registry->entityCount || "the size of the components is smaller than the entities array");
+	return entityGetComponent(entityId, *registry, componentId);
 }  
 
-Bitset entityGetComponentSignature(Entity _this, Registry registry)
+Bitset entityGetComponentSignature(int entityId, Registry registry)
 {
 	Bitset returnValue = 0;
-	returnValue = *(Bitset *)arrayGetElementAt(registry.componentSignatures, _this.id);
+	returnValue = *(Bitset *)arrayGetElementAt(registry.componentSignatures, entityId);
 	return returnValue;
 }
 
@@ -81,16 +73,15 @@ Registry registryUpdate(Registry _this)
 		arrayClear(_this.entitiesPerSystem[i]);
 	}
 
-	for(int j = 0; j < _this.entities->size; j++)
+	for(int entityId = 0; entityId < _this.entityCount; entityId++)
 	{
-		Entity *entity = arrayGetElementAt(_this.entities, j);
-		Bitset componentSignature = entityGetComponentSignature(*entity, _this);
+		Bitset componentSignature = entityGetComponentSignature(entityId, _this);
 		for(int systemIndex = 0; systemIndex < SYSTEM_COUNT; systemIndex++)
 		{
 			// if the entity match the interest signature of the system we add it to the systems entity array;
 			if((componentSignature & _this.systemInterestSignatures[systemIndex]) == _this.systemInterestSignatures[systemIndex])
 			{
-				_this.entitiesPerSystem[systemIndex] = arrayAddElement(_this.entitiesPerSystem[systemIndex], entity);
+				_this.entitiesPerSystem[systemIndex] = arrayAddElement(_this.entitiesPerSystem[systemIndex], &entityId);
 			}
 		}
 	}
@@ -103,9 +94,9 @@ ArrayHeader* systemGetEntities(int systemId, Registry registry)
 	return returnValue;
 }
 
-Registry registryAddEntityToGroup(Registry _this, Entity entity, int groupId)
+Registry registryAddEntityToGroup(Registry _this, int entityId, int groupId)
 {
-	_this.groups[groupId] = arrayAddElement(_this.groups[groupId], &entity);
+	_this.groups[groupId] = arrayAddElement(_this.groups[groupId], entityId);
 	return _this;
 }
 #endif
