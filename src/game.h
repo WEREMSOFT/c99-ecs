@@ -177,6 +177,25 @@ static Game gameCreateEntities(Game _this, Vector2 scaleV)
 
 		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
 	}
+	// Entity 3
+	{
+		int entityId = entityCreate(&_this.registry);
+
+		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_LANDING_BASE, 32, 32, 0, 0, 0, 2.);
+		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
+		
+		TransformComponent transformComponent = {{10, 10}, scaleV, 0};
+		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
+
+		CircularMovementComponent cmc = {.phase = 0., .center = {300., 100.}, .radius = 100. };
+
+		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
+	}
+
+	_this.registry = registryUpdate(_this.registry);
+
+	entityDelete(1, &_this.registry);
+
 	return _this;
 }
 
@@ -187,12 +206,15 @@ Game gameInit(Game _this)
 	CREATE_TEXTURE_ASSET(TEXTURE_TREE, "./assets/images/tree.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_TANK_TIGER_UP, "./assets/images/tank-tiger-up.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_TRUCK_FORD_DOWN, "./assets/images/tank-tiger-up.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_TRUCK_FORD_DOWN, "./assets/images/tank-tiger-up.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_LANDING_BASE, "./assets/images/landing-base.png");
+
 	#undef CREATE_TEXTURE_ASSET
 
 	float scale = 1.;
 	Vector2 scaleV = {scale, scale};
 
-	{
+	if(false){
 		int cols = 25, rows = 20;
 		int tilemap[rows][cols];
 

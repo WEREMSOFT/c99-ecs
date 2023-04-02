@@ -66,6 +66,52 @@ Bitset entityGetComponentSignature(int entityId, Registry registry)
 	return returnValue;
 }
 
+int entityDelete(int entityId, Registry* registry)
+{
+	Bitset componentSignature = entityGetComponentSignature(entityId, *registry);
+
+	// Clean components for entity
+	for(int componentId = 0; componentId < COMPONENT_COUNT; componentId++)
+	{
+		if(bitsetIsSet(componentSignature, componentId))
+		{
+			int* componentIndex = arrayGetElementAt(registry->entity2Component[componentId], entityId);
+			arrayDeleteElement(registry->components[componentId], *componentIndex);
+
+			for(int mapIndex = 0; mapIndex < registry->entity2Component[componentId]->size; mapIndex++)
+			{
+				int* index = arrayGetElementAt(registry->entity2Component[componentId], mapIndex);
+				if(index >= componentIndex)
+				{
+					index--;
+				}
+			}
+			registry->entity2Component[componentId]->size--;
+		}
+	}
+	// Clean system where entity is processed
+	for(int systemId = 0; systemId < SYSTEM_COUNT; systemId++)
+	{
+		Bitset systemInterestSignature = registry->systemInterestSignatures[systemId];
+		// if the entity match the interest signature of the system we add it to the systems entity array;
+		if((componentSignature & systemInterestSignature) == systemInterestSignature)
+		{
+			for(int j = 0; j < registry->entitiesPerSystem[entityId]->size; j++)
+			{
+				 int* entityIdInSystemGroup = (int *)arrayGetElementAt(registry->entitiesPerSystem[systemId], j);
+				 if(*entityIdInSystemGroup >= entityId)
+				 {
+					*entityIdInSystemGroup--;
+				 }
+				 registry->entitiesPerSystem[entityId]->size--;
+			}
+
+		}	
+	}
+
+	return registry->entityCount--;
+}
+
 Registry registryUpdate(Registry _this)
 {
 	for(int i = 0; i < SYSTEM_COUNT; i++)
