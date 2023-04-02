@@ -25,6 +25,15 @@ typedef struct
 	Vector Velocity;
 } RigidBodyComponent;
 
+// CIRCULAR MOVEMENT
+typedef struct
+{
+	float phase;
+	float radius;
+	Vector center;
+} CircularMovementComponent;
+
+
 // SPRITE
 typedef struct
 {

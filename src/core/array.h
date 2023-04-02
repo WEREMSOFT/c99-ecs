@@ -2,6 +2,7 @@
 #define __ARRAY_H__
 
 #include <assert.h>
+#include <stdlib.h>
 
 #define myMalloc malloc
 #define myFree free

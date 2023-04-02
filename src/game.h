@@ -9,6 +9,7 @@ const int MILLISECONDS_PER_FRAME = 1000 / FPS;
 enum ComponentEnum
 {
 	COMPONENT_NONE,
+	COMPONENT_CIRCULAR_MOVEMENT,
 	COMPONENT_TRANSFORM,
 	COMPONENT_RIGID_BODY,
 	COMPONENT_SPRITE,
@@ -18,6 +19,7 @@ enum ComponentEnum
 enum SystemEnum
 {
 	SYSTEM_MOVEMENT,
+	SYSTEM_CIRCULAR_MOVEMENT,
 	SYSTEM_RENDER,
 	SYSTEM_COUNT
 };
@@ -51,6 +53,7 @@ Registry registryCreate()
 	returnValue.components[COMPONENT_TRANSFORM] = arrayCreate(MAX_ENTITIES, sizeof(TransformComponent));
 	returnValue.components[COMPONENT_RIGID_BODY] = arrayCreate(MAX_ENTITIES, sizeof(RigidBodyComponent));
 	returnValue.components[COMPONENT_SPRITE] = arrayCreate(MAX_ENTITIES, sizeof(SpriteComponent));
+	returnValue.components[COMPONENT_CIRCULAR_MOVEMENT] = arrayCreate(MAX_ENTITIES, sizeof(CircularMovementComponent));
 
 	for(int i = 0; i < COMPONENT_COUNT; i ++)
 		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
@@ -63,6 +66,10 @@ Registry registryCreate()
 	
 	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_TRANSFORM);
 	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_RIGID_BODY);
+
+
+	returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_TRANSFORM);
+	returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_CIRCULAR_MOVEMENT);
 
 	returnValue.systemInterestSignatures[SYSTEM_RENDER] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_RENDER], COMPONENT_SPRITE);
 
@@ -182,9 +189,13 @@ Game gameInit(Game _this)
 		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
 		
 		TransformComponent transformComponent = {{10, 10}, scaleV, 0};
-
 		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
-		entityAddComponent(entityId, &_this.registry, &((RigidBodyComponent){0., 0.}), COMPONENT_RIGID_BODY);
+
+		CircularMovementComponent cmc = {.phase = 0., .center = {100., 100.}, .radius = 100. };
+
+		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
+
+		// entityAddComponent(entityId, &_this.registry, &((RigidBodyComponent){0., 0.}), COMPONENT_RIGID_BODY);
 	}
 
 	return _this;
@@ -241,6 +252,7 @@ Game gameUpdate(Game _this)
 	_this.millisecondsPreviousFrame = SDL_GetTicks();
 
 	movementSystem(_this.registry);
+	circularMovementSystem(_this.registry);
 
 	_this.registry = registryUpdate(_this.registry);
 	return _this;
