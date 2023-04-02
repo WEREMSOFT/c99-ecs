@@ -194,8 +194,6 @@ Game gameInit(Game _this)
 		CircularMovementComponent cmc = {.phase = 0., .center = {100., 100.}, .radius = 100. };
 
 		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
-
-		// entityAddComponent(entityId, &_this.registry, &((RigidBodyComponent){0., 0.}), COMPONENT_RIGID_BODY);
 	}
 
 	return _this;
@@ -252,7 +250,7 @@ Game gameUpdate(Game _this)
 	_this.millisecondsPreviousFrame = SDL_GetTicks();
 
 	movementSystem(_this.registry);
-	circularMovementSystem(_this.registry);
+	circularMovementSystem(_this.registry, deltaTime);
 
 	_this.registry = registryUpdate(_this.registry);
 	return _this;

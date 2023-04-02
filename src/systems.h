@@ -1,4 +1,8 @@
+#ifndef __SYSTEMS_H__
+#define __SYSTEMS_H__
+
 #include <math.h>
+#include <SDL2/SDL.h>
 
 void movementSystem(Registry registry)
 {
@@ -13,7 +17,7 @@ void movementSystem(Registry registry)
 	}
 }
 
-void circularMovementSystem(Registry registry)
+void circularMovementSystem(Registry registry, float deltaTime)
 {
 	ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT,  registry);
 	for(int entityPerSystemIndex = 0; entityPerSystemIndex < entities->size; entityPerSystemIndex++)
@@ -25,7 +29,7 @@ void circularMovementSystem(Registry registry)
 		transform->position.y = cmc->center.y + sinf(cmc->phase) * cmc->radius;
 		transform->position.x = cmc->center.x + cosf(cmc->phase) * cmc->radius;
 
-		cmc->phase += 0.2;
+		cmc->phase += 5. * deltaTime;
 	}
 }
 
@@ -49,3 +53,5 @@ void renderSystem(Registry registry, AssetStore assetStore, SDL_Renderer* render
 		SDL_RenderCopyEx(renderer, texture, &sprite->srcRect, &destRect, transform->rotation, NULL, sprite->flip);
 	}
 }
+
+#endif
