@@ -147,13 +147,50 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
     fclose(fp);
 }
 
+static Game gameCreateEntities(Game _this, Vector2 scaleV)
+{
+	// Entity 1
+	{
+		int entityId = entityCreate(&_this.registry);
+
+		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 0, 0, 0, 2.);
+		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
+		
+		TransformComponent transformComponent = {{10, 10}, scaleV, 0};
+		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
+
+		CircularMovementComponent cmc = {.phase = 0., .center = {100., 100.}, .radius = 100. };
+
+		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
+	}
+	// Entity 2
+	{
+		int entityId = entityCreate(&_this.registry);
+
+		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TANK_TIGER_UP, 32, 32, 0, 0, 0, 2.);
+		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
+		
+		TransformComponent transformComponent = {{10, 10}, scaleV, 0};
+		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
+
+		CircularMovementComponent cmc = {.phase = 0., .center = {200., 100.}, .radius = 100. };
+
+		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
+	}
+	return _this;
+}
+
 Game gameInit(Game _this)
 {
-	_this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, TEXTURE_TILEMAP_IMAGE, "./assets/tilemaps/jungle.png");
-	_this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, TEXTURE_TREE_IMAGE, "./assets/images/tree.png");
+	#define CREATE_TEXTURE_ASSET(textureId, imagePath) _this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, (textureId), (imagePath))
+	CREATE_TEXTURE_ASSET(TEXTURE_TILE_MAP, "./assets/tilemaps/jungle.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_TREE, "./assets/images/tree.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_TANK_TIGER_UP, "./assets/images/tank-tiger-up.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_TRUCK_FORD_DOWN, "./assets/images/tank-tiger-up.png");
+	#undef CREATE_TEXTURE_ASSET
 
-		float scale = 1.;
-		Vector2 scaleV = {scale, scale};
+	float scale = 1.;
+	Vector2 scaleV = {scale, scale};
 
 	{
 		int cols = 25, rows = 20;
@@ -171,7 +208,7 @@ Game gameInit(Game _this)
 				SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};;
 				SDL_Rect destRect = (SDL_Rect){ x * 32, y * 32, 32, 32 };
 				
-				SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TILEMAP_IMAGE, 32, 32, 0, srcRect.x, srcRect.y, scale);
+				SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TILE_MAP, 32, 32, 0, srcRect.x, srcRect.y, scale);
 				entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
 
 				Vector2 position = {destRect.x * scale, destRect.y * scale};
@@ -181,21 +218,9 @@ Game gameInit(Game _this)
 			}
 		}
 	}
-	// Entity 1
-	{
-		int entityId = entityCreate(&_this.registry);
 
-		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE_IMAGE, 16, 32, 0, 0, 0, 2.);
-		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
-		
-		TransformComponent transformComponent = {{10, 10}, scaleV, 0};
-		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
-
-		CircularMovementComponent cmc = {.phase = 0., .center = {100., 100.}, .radius = 100. };
-
-		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
-	}
-
+	_this = gameCreateEntities(_this, scaleV);
+	
 	return _this;
 }
 
@@ -239,12 +264,17 @@ void gameRender(Game _this)
 	SDL_RenderPresent(_this.renderer);
 }
 
-Game gameUpdate(Game _this)
+static void delayFrameBasedOnElapsedTime(Game _this)
 {
-	int currentTicks = SDL_GetTicks();
+	int currentTicks = SDL_GetTicks(); 
 	int timeToWait = MILLISECONDS_PER_FRAME - currentTicks + _this.millisecondsPreviousFrame;
 	if (timeToWait > 0 && timeToWait < MILLISECONDS_PER_FRAME)
 		SDL_Delay(timeToWait);
+}
+
+Game gameUpdate(Game _this)
+{
+	delayFrameBasedOnElapsedTime(_this);
 
 	float deltaTime = (SDL_GetTicks() - _this.millisecondsPreviousFrame) / 1000.f;
 	_this.millisecondsPreviousFrame = SDL_GetTicks();
