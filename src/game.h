@@ -194,7 +194,7 @@ static Game gameCreateEntities(Game _this, Vector2 scaleV)
 
 	_this.registry = registryUpdate(_this.registry);
 
-	entityDelete(baseEntityId + 2, &_this.registry);
+	entityDelete(2, &_this.registry);
 
 	return _this;
 }
