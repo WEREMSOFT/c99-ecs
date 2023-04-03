@@ -1,30 +1,41 @@
 #ifndef __LOGGER_H__
 #define __LOGGER_H__
 
-#include <time.h>
-#include <string.h>
 #include <stdio.h>
+#include <time.h>
 
-void currentDateTimeToString(char *destinationString)
-{
-	time_t t = time(NULL);
-  	struct tm tm = *localtime(&t);
-  	snprintf(destinationString, 200, "%d/%02d/%02d %02d:%02d:%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-}
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define RED "\033[31m"
+#define RESET "\033[0m"
 
-void loggerLog(char* message)
-{
-	char dateTime[50];
-	currentDateTimeToString(dateTime);
+#define loggerLog(format, ...) \
+    do { \
+        time_t t = time(NULL); \
+        struct tm tm = *localtime(&t); \
+        printf(GREEN "[%d-%02d-%02d %02d:%02d:%02d] " format "\n" RESET, \
+               tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, \
+               tm.tm_hour, tm.tm_min, tm.tm_sec, \
+               ##__VA_ARGS__); \
+    } while (0)
 
-	printf("\033[32mLOG: [%s] %s\n", dateTime, message);
-}
+#define loggerError(format, ...) \
+    do { \
+        time_t t = time(NULL); \
+        struct tm tm = *localtime(&t); \
+        printf(RED "[%d-%02d-%02d %02d:%02d:%02d] " format "\n" RESET, \
+               tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, \
+               tm.tm_hour, tm.tm_min, tm.tm_sec, \
+               ##__VA_ARGS__); \
+    } while (0)
 
-void loggerError(char* message)
-{
-	char dateTime[50];
-	currentDateTimeToString(dateTime);
-
-	printf("\033[31mERR: [%s] %s\n", dateTime, message);
-}
+#define loggerWarning(format, ...) \
+    do { \
+        time_t t = time(NULL); \
+        struct tm tm = *localtime(&t); \
+        printf(YELLOW "[%d-%02d-%02d %02d:%02d:%02d] " format "\n" RESET, \
+               tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, \
+               tm.tm_hour, tm.tm_min, tm.tm_sec, \
+               ##__VA_ARGS__); \
+    } while (0)
 #endif

@@ -90,24 +90,24 @@ int entityDelete(int entityId, Registry* registry)
 		}
 	}
 	// Clean system where entity is processed
-	for(int systemId = 0; systemId < SYSTEM_COUNT; systemId++)
-	{
-		Bitset systemInterestSignature = registry->systemInterestSignatures[systemId];
-		// if the entity match the interest signature of the system we add it to the systems entity array;
-		if((componentSignature & systemInterestSignature) == systemInterestSignature)
-		{
-			for(int j = 0; j < registry->entitiesPerSystem[entityId]->size; j++)
-			{
-				 int* entityIdInSystemGroup = (int *)arrayGetElementAt(registry->entitiesPerSystem[systemId], j);
-				 if(*entityIdInSystemGroup >= entityId)
-				 {
-					*entityIdInSystemGroup--;
-				 }
-				 registry->entitiesPerSystem[entityId]->size--;
-			}
+	// for(int systemId = 0; systemId < SYSTEM_COUNT; systemId++)
+	// {
+	// 	Bitset systemInterestSignature = registry->systemInterestSignatures[systemId];
+	// 	// if the entity match the interest signature of the system we add it to the systems entity array;
+	// 	if((componentSignature & systemInterestSignature) == systemInterestSignature)
+	// 	{
+	// 		for(int j = 0; j < registry->entitiesPerSystem[entityId]->size; j++)
+	// 		{
+	// 			 int* entityIdInSystemGroup = (int *)arrayGetElementAt(registry->entitiesPerSystem[systemId], j);
+	// 			 if(*entityIdInSystemGroup >= entityId)
+	// 			 {
+	// 				*entityIdInSystemGroup--;
+	// 			 }
+	// 			 registry->entitiesPerSystem[entityId]->size--;
+	// 		}
 
-		}	
-	}
+	// 	}	
+	// }
 
 	return registry->entityCount--;
 }
