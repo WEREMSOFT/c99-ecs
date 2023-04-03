@@ -66,6 +66,12 @@ Bitset entityGetComponentSignature(int entityId, Registry registry)
 	return returnValue;
 }
 
+ArrayHeader* systemGetEntities(int systemId, Registry registry)
+{
+	ArrayHeader* returnValue = registry.entitiesPerSystem[systemId];
+	return returnValue;
+}
+
 int entityDelete(int entityId, Registry* registry)
 {
 	Bitset componentSignature = entityGetComponentSignature(entityId, *registry);
@@ -96,16 +102,16 @@ int entityDelete(int entityId, Registry* registry)
 		// if the entity match the interest signature of the system we add it to the systems entity array;
 		if((componentSignature & systemInterestSignature) == systemInterestSignature)
 		{
-			for(int j = 0; j < registry->entitiesPerSystem[entityId]->size; j++)
+			for(int j = 0; j < registry->entitiesPerSystem[systemId]->size; j++)
 			{
 				 int* entityIdInSystemGroup = (int *)arrayGetElementAt(registry->entitiesPerSystem[systemId], j);
 				 if(*entityIdInSystemGroup >= entityId)
 				 {
 					*entityIdInSystemGroup--;
 				 }
-				 registry->entitiesPerSystem[entityId]->size--;
 			}
-		}	
+			registry->entitiesPerSystem[systemId]->size--;
+		}
 	}
 
 	return registry->entityCount--;
@@ -131,12 +137,6 @@ Registry registryUpdate(Registry _this)
 		}
 	}
 	return _this;
-}
-
-ArrayHeader* systemGetEntities(int systemId, Registry registry)
-{
-	ArrayHeader* returnValue = registry.entitiesPerSystem[systemId];
-	return returnValue;
 }
 
 Registry registryAddEntityToGroup(Registry _this, int entityId, int groupId)

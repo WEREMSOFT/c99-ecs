@@ -10,17 +10,17 @@ enum ComponentEnum
 {
 	COMPONENT_SPRITE,
 	COMPONENT_TRANSFORM,
-	COMPONENT_COUNT,
 	COMPONENT_CIRCULAR_MOVEMENT,
-	COMPONENT_RIGID_BODY
+	COMPONENT_RIGID_BODY,
+	COMPONENT_COUNT,
 };
 
 enum SystemEnum
 {
+	SYSTEM_RENDER,
 	SYSTEM_MOVEMENT,
 	SYSTEM_CIRCULAR_MOVEMENT,
-	SYSTEM_RENDER,
-	SYSTEM_COUNT
+	SYSTEM_COUNT,
 };
 
 enum TagsEnum
@@ -148,10 +148,11 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
 
 static Game gameCreateEntities(Game _this, Vector2 scaleV)
 {
+	int baseEntityId = -1;
 	// Entity 1
 	{
 		int entityId = entityCreate(&_this.registry);
-
+		baseEntityId = entityId;
 		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 0, 0, 0, 2.);
 		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
 		
@@ -193,7 +194,7 @@ static Game gameCreateEntities(Game _this, Vector2 scaleV)
 
 	_this.registry = registryUpdate(_this.registry);
 
-	entityDelete(1, &_this.registry);
+	entityDelete(baseEntityId + 2, &_this.registry);
 
 	return _this;
 }
@@ -212,7 +213,8 @@ Game gameInit(Game _this)
 	float scale = 1.;
 	Vector2 scaleV = {scale, scale};
 
-	if(false){
+	// if(false)
+	{
 		int cols = 25, rows = 20;
 		int tilemap[rows][cols];
 

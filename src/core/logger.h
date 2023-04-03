@@ -10,32 +10,47 @@
 #define RESET "\033[0m"
 
 #define loggerLog(format, ...) \
-    do { \
+ 	do { \
         time_t t = time(NULL); \
         struct tm tm = *localtime(&t); \
-        printf(GREEN "[%d-%02d-%02d %02d:%02d:%02d] " format "\n" RESET, \
-               tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, \
+        char prefix[80]; \
+        sprintf(prefix, GREEN "[%02d:%02d:%02d] %s:%d", \
                tm.tm_hour, tm.tm_min, tm.tm_sec, \
-               ##__VA_ARGS__); \
+               __FILE__, __LINE__); \
+        int prefix_length = strlen(prefix); \
+        printf("%s", prefix); \
+        printf("%*s:", (int)(40 - prefix_length - strlen(RESET)), ""); \
+        printf(format, ##__VA_ARGS__); \
+        printf(RESET "\n"); \
     } while (0)
 
 #define loggerError(format, ...) \
-    do { \
+ 	do { \
         time_t t = time(NULL); \
         struct tm tm = *localtime(&t); \
-        printf(RED "[%d-%02d-%02d %02d:%02d:%02d] " format "\n" RESET, \
-               tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, \
+        char prefix[80]; \
+        sprintf(prefix, RED "[%02d:%02d:%02d] %s:%d", \
                tm.tm_hour, tm.tm_min, tm.tm_sec, \
-               ##__VA_ARGS__); \
+               __FILE__, __LINE__); \
+        int prefix_length = strlen(prefix); \
+        printf("%s", prefix); \
+        printf("%*s:", (int)(40 - prefix_length - strlen(RESET)), ""); \
+        printf(format, ##__VA_ARGS__); \
+        printf(RESET "\n"); \
     } while (0)
 
 #define loggerWarning(format, ...) \
-    do { \
+ 	do { \
         time_t t = time(NULL); \
         struct tm tm = *localtime(&t); \
-        printf(YELLOW "[%d-%02d-%02d %02d:%02d:%02d] " format "\n" RESET, \
-               tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, \
+        char prefix[80]; \
+        sprintf(prefix, YELLOW "[%02d:%02d:%02d] %s:%d", \
                tm.tm_hour, tm.tm_min, tm.tm_sec, \
-               ##__VA_ARGS__); \
+               __FILE__, __LINE__); \
+        int prefix_length = strlen(prefix); \
+        printf("%s", prefix); \
+        printf("%*s:", (int)(40 - prefix_length - strlen(RESET)), ""); \
+        printf(format, ##__VA_ARGS__); \
+        printf(RESET "\n"); \
     } while (0)
 #endif
