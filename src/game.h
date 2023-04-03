@@ -8,7 +8,6 @@ const int MILLISECONDS_PER_FRAME = 1000 / FPS;
 
 enum ComponentEnum
 {
-	COMPONENT_NONE,
 	COMPONENT_CIRCULAR_MOVEMENT,
 	COMPONENT_TRANSFORM,
 	COMPONENT_RIGID_BODY,
@@ -208,7 +207,6 @@ Game gameInit(Game _this)
 	CREATE_TEXTURE_ASSET(TEXTURE_TRUCK_FORD_DOWN, "./assets/images/tank-tiger-up.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_TRUCK_FORD_DOWN, "./assets/images/tank-tiger-up.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_LANDING_BASE, "./assets/images/landing-base.png");
-
 	#undef CREATE_TEXTURE_ASSET
 
 	float scale = 1.;
