@@ -113,7 +113,10 @@ int entityDelete(int entityId, Registry* registry)
 			registry->entitiesPerSystem[systemId]->size--;
 		}
 	}
-
+	// Remove the component signature
+	loggerLog("Elements in signature array %d", registry->componentSignatures->size);
+	arrayDeleteElement(registry->componentSignatures, entityId);
+	loggerLog("Elements in signature array %d", registry->componentSignatures->size);
 	return registry->entityCount--;
 }
 
