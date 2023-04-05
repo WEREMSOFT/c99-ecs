@@ -75,6 +75,20 @@ ArrayHeader* arrayAddElement(ArrayHeader* _this, const void* element)
 	return _this;
 }
 
+ArrayHeader* arrayAddElementI(ArrayHeader* _this, int element)
+{
+	assert(_this->dataTypeSize == sizeof(int) && "array does not contains ints");
+	_this = arrayAddElement(_this, &element);
+	return _this;
+}
+
+ArrayHeader* arrayAddElementF(ArrayHeader* _this, float element)
+{
+	assert(_this->dataTypeSize == sizeof(float) && "array does not contains floats");
+	_this = arrayAddElement(_this, &element);
+	return _this;
+}
+
 ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int index)
 {
 	if(index >= _this->capacity)
@@ -105,6 +119,20 @@ void* arrayGetElementAt(ArrayHeader* _this, int index)
 {
 	assert(index < _this->size && "arrayGetElementAt index out of bounds");
 	return &_this->data[index * _this->dataTypeSize];
+}
+
+int arrayGetElementAtI(ArrayHeader* _this, int index)
+{
+	assert(_this->dataTypeSize == sizeof(int) && "array does not contains ints");
+	int *element = arrayGetElementAt(_this, index);
+	return *element;
+}
+
+float arrayGetElementAtf(ArrayHeader* _this, int index)
+{
+	assert(_this->dataTypeSize == sizeof(float) && "array does not contains floats");
+	float *element = arrayGetElementAt(_this, index);
+	return *element;
 }
 
 void* arrayGetElementOrCreateAt(ArrayHeader* _this, int index)

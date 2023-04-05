@@ -21,7 +21,7 @@
         printf(RESET "\n"); \
     } while (0)
 
-#define loggerError(format, ...) \
+#define loggerErr(format, ...) \
  	do { \
         char prefix[80]; \
         sprintf(prefix, RED "[%s:%d]", \
@@ -33,7 +33,7 @@
         printf(RESET "\n"); \
     } while (0)
 
-#define loggerWarning(format, ...) \
+#define loggerWarn(format, ...) \
  	do { \
         char prefix[80]; \
         sprintf(prefix, YELLOW "[%s:%d]", \

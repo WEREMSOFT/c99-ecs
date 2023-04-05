@@ -146,6 +146,18 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
     fclose(fp);
 }
 
+#define PRINT_COMPONENT_ARRAY \
+	{\
+		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);\
+		for(int i = 0; i < entities->size; i++)\
+		{\
+			int entityId = arrayGetElementAtI(entities, i);\
+			int circularComponentId = arrayGetElementAtI(_this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT], entityId);\
+			loggerWarn("entity at %d: %d. Component Id: %d", i, entityId, circularComponentId);\
+		}\
+		loggerErr("cantidad de entities en el sistema de circular mov %d", entities->size);\
+	}\
+
 #define ADD_ENTITY(x, y) \
 	{\
 		phase += .3;\
@@ -180,34 +192,12 @@ static Game gameCreateEntities(Game _this, Vector2 scaleV)
 
 	_this.registry = registryUpdate(_this.registry);
 
-	{
-		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
-
-		for(int i = 0; i < entities->size; i++)
-		{
-			int* entityId = arrayGetElementAt(entities, i);
-			int* circularComponentId = arrayGetElementAt(_this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT],*entityId);
-			loggerWarning("entity at %d: %d. Component Id: %d", i, *entityId, *circularComponentId);
-		}
-
-		loggerWarning("cantidad de entities en el sistema de circular mov %d", entities->size);
-	}
+	PRINT_COMPONENT_ARRAY
 
 	_this.registry = registryDeleteEntity(_this.registry, 0);
 	_this.registry = registryUpdate(_this.registry);
 
-	{
-		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
-
-		for(int i = 0; i < entities->size; i++)
-		{
-			int* entityId = arrayGetElementAt(entities, i);
-			int* circularComponentId = arrayGetElementAt(_this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT],*entityId);
-			loggerWarning("entity at %d: %d. Component Id: %d", i, *entityId, *circularComponentId);
-		}
-
-		loggerError("cantidad de entities en el sistema de circular mov %d", entities->size);
-	}
+	PRINT_COMPONENT_ARRAY
 
 	// _this.registry = registryUpdate(_this.registry);
 	// entityDelete(3, &_this.registry);
@@ -241,9 +231,11 @@ Game gameInit(Game _this)
 
 		loadCSV("./assets/tilemaps/jungle.map", rows, cols, tilemap);
 
-		for(int y = 0; y < rows; y++)
+		// for(int y = 0; y < rows; y++)
+		for(int y = 0; y < 1; y++)
 		{
-			for(int x = 0; x < cols; x++)
+			// for(int x = 0; x < cols; x++)
+			for(int x = 0; x < 1; x++)
 			{
 				int entityId = entityCreate(&_this.registry);
 				entityAddTag(entityId, _this.registry, TAG_TILE);

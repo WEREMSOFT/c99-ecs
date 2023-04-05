@@ -72,7 +72,7 @@ ArrayHeader* systemGetEntities(int systemId, Registry registry)
 	return returnValue;
 }
 
-bool entityHasCommponent(int entityId, int componentId, Registry registry)
+bool entityHasComponent(int entityId, int componentId, Registry registry)
 {
 	Bitset componentSignature = entityGetComponentSignature(entityId, registry);
 	return bitsetIsSet(componentSignature, componentId);
@@ -105,7 +105,7 @@ void entityRemoveAllComponents(int entityId, Registry registry)
 {
 	for(int componentId = 0; componentId < COMPONENT_COUNT; componentId++)
 	{
-		if(entityHasCommponent(entityId,  componentId, registry))
+		if(entityHasComponent(entityId,  componentId, registry))
 		{
 			entityRemoveComponent(entityId, componentId, registry);
 		}
@@ -116,10 +116,10 @@ void systemRemoveEntity(int systemId, int entityId, Registry registry)
 {
 	for(int j = 0; j < registry.entitiesPerSystem[systemId]->size; j++)
 	{
-			int* entityIdInSystemGroup = (int *)arrayGetElementAt(registry.entitiesPerSystem[systemId], j);
+			int* entityIdInSystemGroup = arrayGetElementAt(registry.entitiesPerSystem[systemId], j);
 			if(*entityIdInSystemGroup >= entityId)
 			{
-			*entityIdInSystemGroup--;
+				*entityIdInSystemGroup--;
 			}
 	}
 	registry.entitiesPerSystem[systemId]->size--;
@@ -139,23 +139,6 @@ Registry registryDeleteEntity(Registry registry, int entityId)
 	arrayDeleteElement(registry.componentSignatures, entityId);
 	registry.entityCount--;
 	return registry;
-}
-
-int entityDelete(int entityId, Registry* registry)
-{
-	entityRemoveAllComponents(entityId, *registry); 
-	// Clean system where entity is processed
-	for(int systemId = 0; systemId < SYSTEM_COUNT; systemId++)
-	{
-		// if the entity match the interest signature of the system we add it to the systems entity array;
-		if(systemIsInterestedInEntity(systemId, entityId, *registry))
-		{
-			systemRemoveEntity(systemId, entityId, *registry);
-		}
-	}
-	// Remove the component signature
-	arrayDeleteElement(registry->componentSignatures, entityId);
-	return registry->entityCount--;
 }
 
 void registryCleanSystemArrays(Registry registry)
