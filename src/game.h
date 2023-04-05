@@ -197,11 +197,11 @@ Game gameInit(Game _this)
 
 		loadCSV("./assets/tilemaps/jungle.map", rows, cols, tilemap);
 
-		for(int y = 0; y < rows; y+=2)
-		// for(int y = 0; y < 1; y++)
+		// for(int y = 0; y < rows; y+=2)
+		for(int y = 0; y < 1; y++)
 		{
-			for(int x = 0; x < cols; x+=2)
-			// for(int x = 0; x < 1; x++)
+			// for(int x = 0; x < cols; x+=2)
+			for(int x = 0; x < 1; x++)
 			{
 				int entityId = entityCreate(&_this.registry);
 				entityAddTag(entityId, _this.registry, TAG_TILE);

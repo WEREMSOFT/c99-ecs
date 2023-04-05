@@ -115,17 +115,36 @@ void entityToComponentCorrectIndex(ArrayHeader* entityToComponent, int component
 	}
 }
 
+void registryDeleteComponentsForEntity(Registry registry, int entityId)
+{
+	for(int componentId = 0; componentId < COMPONENT_COUNT; componentId++)
+	{
+		if(entityHasComponent(entityId, componentId, registry))
+		{
+			int componentIndex = arrayGetElementAtI(registry.entity2Component[componentId], entityId);
+			arrayDeleteElement(registry.components[componentId], componentIndex);
+			for(int mapIndex = 0; mapIndex < registry.entity2Component[componentId]->size; mapIndex++)
+			{
+				int* index = arrayGetElementAt(registry.entity2Component[componentId], mapIndex);
+				if(*index > componentIndex)
+					*index--;
+				loggerLog("index %d", *index);
+			}
+
+		}
+	}
+}
+
 Registry registryDeleteEntity(Registry registry, int entityId)
 {
+	registryDeleteComponentsForEntity(registry, entityId);
+
 	for(int componentId = 0; componentId < COMPONENT_COUNT; componentId++)
 	{
 		arrayDeleteElement(registry.entity2Component[componentId], entityId);
 	}
-
-	// for(int componentId = 0; componentId < COMPONENT_COUNT; componentId++)
-	// {
-	// 	arrayDeleteElement(registry.entity2Component[componentId], entityId);
-	// }
+	
+	
 
 	arrayDeleteElement(registry.componentSignatures, entityId);
 
