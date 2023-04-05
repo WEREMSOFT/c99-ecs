@@ -160,8 +160,6 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
 
 static Game gameCreateEntities(Game _this, Vector2 scaleV)
 {
-
-
 	_this.registry = registryUpdate(_this.registry);
 	{
 		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
@@ -170,10 +168,10 @@ static Game gameCreateEntities(Game _this, Vector2 scaleV)
 
 	
 	int baseEntityId = _this.registry.entityCount + 1;
-	float phase = 0.;
 
 	int* maps = _this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT]->data;
 
+	float phase = 0.;
 	ADD_ENTITY(1, 1);
 	ADD_ENTITY(2, 1);
 	ADD_ENTITY(3, 1);
@@ -195,7 +193,7 @@ static Game gameCreateEntities(Game _this, Vector2 scaleV)
 		loggerWarning("cantidad de entities en el sistema de circular mov %d", entities->size);
 	}
 
-	entityDelete(0, &_this.registry);
+	_this.registry = registryDeleteEntity(_this.registry, 0);
 	_this.registry = registryUpdate(_this.registry);
 
 	{
