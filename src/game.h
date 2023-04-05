@@ -11,14 +11,12 @@ enum ComponentEnum
 	COMPONENT_SPRITE,
 	COMPONENT_TRANSFORM,
 	COMPONENT_CIRCULAR_MOVEMENT,
-	COMPONENT_RIGID_BODY,
 	COMPONENT_COUNT,
 };
 
 enum SystemEnum
 {
 	SYSTEM_RENDER,
-	SYSTEM_MOVEMENT,
 	SYSTEM_CIRCULAR_MOVEMENT,
 	SYSTEM_COUNT,
 };
@@ -50,7 +48,6 @@ Registry registryCreate()
 	returnValue.tags->size = returnValue.tags->capacity;
 
 	returnValue.components[COMPONENT_TRANSFORM] = arrayCreate(MAX_ENTITIES, sizeof(TransformComponent));
-	returnValue.components[COMPONENT_RIGID_BODY] = arrayCreate(MAX_ENTITIES, sizeof(RigidBodyComponent));
 	returnValue.components[COMPONENT_SPRITE] = arrayCreate(MAX_ENTITIES, sizeof(SpriteComponent));
 	returnValue.components[COMPONENT_CIRCULAR_MOVEMENT] = arrayCreate(MAX_ENTITIES, sizeof(CircularMovementComponent));
 
@@ -62,10 +59,6 @@ Registry registryCreate()
 
 	for(int i = 0; i < SYSTEM_COUNT; i++)
 		returnValue.entitiesPerSystem[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
-	
-	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_TRANSFORM);
-	returnValue.systemInterestSignatures[SYSTEM_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_RIGID_BODY);
-
 
 	returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_TRANSFORM);
 	returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_CIRCULAR_MOVEMENT);
@@ -146,18 +139,6 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
     fclose(fp);
 }
 
-#define PRINT_COMPONENT_ARRAY \
-	{\
-		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);\
-		for(int i = 0; i < entities->size; i++)\
-		{\
-			int entityId = arrayGetElementAtI(entities, i);\
-			int circularComponentId = arrayGetElementAtI(_this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT], entityId);\
-			loggerWarn("entity at %d: %d. Component Id: %d", i, entityId, circularComponentId);\
-		}\
-		loggerErr("cantidad de entities en el sistema de circular mov %d", entities->size);\
-	}\
-
 #define ADD_ENTITY(x, y) \
 	{\
 		phase += .3;\
@@ -172,16 +153,14 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
 
 static Game gameCreateEntities(Game _this, Vector2 scaleV)
 {
+	Registry* registry = &_this.registry;
 	_this.registry = registryUpdate(_this.registry);
 	{
 		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
 		loggerLog("cantidad de entities en el sistema de circular mov %d", entities->size);
 	}
-
 	
 	int baseEntityId = _this.registry.entityCount + 1;
-
-	int* maps = _this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT]->data;
 
 	float phase = 0.;
 	ADD_ENTITY(1, 1);
@@ -191,13 +170,19 @@ static Game gameCreateEntities(Game _this, Vector2 scaleV)
 	ADD_ENTITY(5, 1);
 
 	_this.registry = registryUpdate(_this.registry);
-
-	PRINT_COMPONENT_ARRAY
-
 	_this.registry = registryDeleteEntity(_this.registry, 0);
 	_this.registry = registryUpdate(_this.registry);
+	{
+		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
+		for(int i = 0; i < entities->size; i++)
+		{
+			int entityId = arrayGetElementAtI(entities, i);
+			int circularComponentId = arrayGetElementAtI(_this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT], entityId);
+			loggerWarn("entity at %d: %d. Component Id: %d", i, entityId, circularComponentId);
+		}
+		loggerErr("cantidad de entities en el sistema de circular mov %d", entities->size);
+	}
 
-	PRINT_COMPONENT_ARRAY
 
 	// _this.registry = registryUpdate(_this.registry);
 	// entityDelete(3, &_this.registry);
@@ -328,7 +313,6 @@ Game gameUpdate(Game _this)
 	float deltaTime = (SDL_GetTicks() - _this.millisecondsPreviousFrame) / 1000.f;
 	_this.millisecondsPreviousFrame = SDL_GetTicks();
 
-	movementSystem(_this.registry);
 	circularMovementSystem(_this.registry, deltaTime);
 
 	_this.registry = registryUpdate(_this.registry);
