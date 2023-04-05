@@ -169,28 +169,9 @@ static Game gameCreateEntities(Game _this, Vector2 scaleV)
 	ADD_ENTITY(4, 1);
 	ADD_ENTITY(5, 1);
 
-	_this.registry = registryUpdate(_this.registry);
 	_this.registry = registryDeleteEntity(_this.registry, 0);
-	_this.registry = registryUpdate(_this.registry);
-	{
-		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
-		for(int i = 0; i < entities->size; i++)
-		{
-			int entityId = arrayGetElementAtI(entities, i);
-			int circularComponentId = arrayGetElementAtI(_this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT], entityId);
-			loggerWarn("entity at %d: %d. Component Id: %d", i, entityId, circularComponentId);
-		}
-		loggerErr("cantidad de entities en el sistema de circular mov %d", entities->size);
-	}
-
-
-	// _this.registry = registryUpdate(_this.registry);
-	// entityDelete(3, &_this.registry);
-	// entityDelete(2, &_this.registry);
-	// entityDelete(1, &_this.registry);
-	// _this.registry = registryUpdate(_this.registry);
-	// entityDelete(1, &_this.registry);
-	// _this.registry = registryUpdate(_this.registry);
+	_this.registry = registryDeleteEntity(_this.registry, 2);
+	_this.registry = registryDeleteEntity(_this.registry, 5);
 
 	return _this;
 }
@@ -216,11 +197,11 @@ Game gameInit(Game _this)
 
 		loadCSV("./assets/tilemaps/jungle.map", rows, cols, tilemap);
 
-		// for(int y = 0; y < rows; y++)
-		for(int y = 0; y < 1; y++)
+		for(int y = 0; y < rows; y+=2)
+		// for(int y = 0; y < 1; y++)
 		{
-			// for(int x = 0; x < cols; x++)
-			for(int x = 0; x < 1; x++)
+			for(int x = 0; x < cols; x+=2)
+			// for(int x = 0; x < 1; x++)
 			{
 				int entityId = entityCreate(&_this.registry);
 				entityAddTag(entityId, _this.registry, TAG_TILE);

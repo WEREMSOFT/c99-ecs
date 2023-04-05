@@ -115,43 +115,20 @@ void entityToComponentCorrectIndex(ArrayHeader* entityToComponent, int component
 	}
 }
 
-void entityRemoveAllComponents(int entityId, Registry registry)
+Registry registryDeleteEntity(Registry registry, int entityId)
 {
 	for(int componentId = 0; componentId < COMPONENT_COUNT; componentId++)
 	{
-		if(entityHasComponent(entityId,  componentId, registry))
-		{
-			entityRemoveComponent(entityId, componentId, registry);
-			arrayDeleteElement(registry.entity2Component[componentId], entityId);
-			entityToComponentCorrectIndex(registry.entity2Component[componentId], componentId);
-		}
+		arrayDeleteElement(registry.entity2Component[componentId], entityId);
 	}
-}
 
-void systemRemoveEntity(int systemId, int entityId, Registry registry)
-{
-	if(!systemIsInterestedInEntity(systemId, entityId, registry))
-		return;
+	// for(int componentId = 0; componentId < COMPONENT_COUNT; componentId++)
+	// {
+	// 	arrayDeleteElement(registry.entity2Component[componentId], entityId);
+	// }
 
-	for(int j = 0; j < registry.entitiesPerSystem[systemId]->size; j++)
-	{
-			int* entityIdInSystemGroup = arrayGetElementAt(registry.entitiesPerSystem[systemId], j);
-			if(*entityIdInSystemGroup > entityId)
-			{
-				loggerErr("value %d", *entityIdInSystemGroup);
-				*entityIdInSystemGroup--;
-				loggerLog("value %d", *entityIdInSystemGroup);
-			}
-	}
-	registry.entitiesPerSystem[systemId]->size--;
-}
-
-Registry registryDeleteEntity(Registry registry, int entityId)
-{
-	// after this line, all components array that includes the entity are 1 element short
-	entityRemoveAllComponents(entityId, registry); 
-	// Remove the component signature
 	arrayDeleteElement(registry.componentSignatures, entityId);
+
 	registry.entityCount--;
 	return registry;
 }
