@@ -146,55 +146,78 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
     fclose(fp);
 }
 
+#define ADD_ENTITY(x, y) \
+	{\
+		phase += .3;\
+		int entityId = entityCreate(&_this.registry);\
+		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 0, 0, 0, 2.);\
+		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);\
+		TransformComponent transformComponent = {{10, 10}, scaleV, 0};\
+		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);\
+		CircularMovementComponent cmc = {.phase = phase, .center = {(x) * 100., (y) * 100.}, .radius = 100. };\
+		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);\
+	}
+
 static Game gameCreateEntities(Game _this, Vector2 scaleV)
 {
-	int baseEntityId = -1;
-	// Entity 1
-	{
-		int entityId = entityCreate(&_this.registry);
-		baseEntityId = entityId;
-		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 0, 0, 0, 2.);
-		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
-		
-		TransformComponent transformComponent = {{10, 10}, scaleV, 0};
-		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
 
-		CircularMovementComponent cmc = {.phase = 0., .center = {100., 100.}, .radius = 100. };
-
-		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
-	}
-	// Entity 2
-	{
-		int entityId = entityCreate(&_this.registry);
-
-		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TANK_TIGER_UP, 32, 32, 0, 0, 0, 2.);
-		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
-		
-		TransformComponent transformComponent = {{10, 10}, scaleV, 0};
-		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
-
-		CircularMovementComponent cmc = {.phase = 0., .center = {200., 100.}, .radius = 100. };
-
-		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
-	}
-	// Entity 3
-	{
-		int entityId = entityCreate(&_this.registry);
-
-		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_LANDING_BASE, 32, 32, 0, 0, 0, 2.);
-		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
-		
-		TransformComponent transformComponent = {{10, 10}, scaleV, 0};
-		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
-
-		CircularMovementComponent cmc = {.phase = 0., .center = {300., 100.}, .radius = 100. };
-
-		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
-	}
 
 	_this.registry = registryUpdate(_this.registry);
+	{
+		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
+		loggerLog("cantidad de entities en el sistema de circular mov %d", entities->size);
+	}
+
+	
+	int baseEntityId = _this.registry.entityCount + 1;
+	float phase = 0.;
+
+	int* maps = _this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT]->data;
+
+	ADD_ENTITY(1, 1);
+	ADD_ENTITY(2, 1);
+	ADD_ENTITY(3, 1);
+	ADD_ENTITY(4, 1);
+	ADD_ENTITY(5, 1);
+
+	_this.registry = registryUpdate(_this.registry);
+
+	{
+		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
+
+		for(int i = 0; i < entities->size; i++)
+		{
+			int* entityId = arrayGetElementAt(entities, i);
+			int* circularComponentId = arrayGetElementAt(_this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT],*entityId);
+			loggerWarning("entity at %d: %d. Component Id: %d", i, *entityId, *circularComponentId);
+		}
+
+		loggerWarning("cantidad de entities en el sistema de circular mov %d", entities->size);
+	}
+
+	entityDelete(0, &_this.registry);
+	_this.registry = registryUpdate(_this.registry);
+
+	{
+		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
+
+		for(int i = 0; i < entities->size; i++)
+		{
+			int* entityId = arrayGetElementAt(entities, i);
+			int* circularComponentId = arrayGetElementAt(_this.registry.entity2Component[COMPONENT_CIRCULAR_MOVEMENT],*entityId);
+			loggerWarning("entity at %d: %d. Component Id: %d", i, *entityId, *circularComponentId);
+		}
+
+		loggerError("cantidad de entities en el sistema de circular mov %d", entities->size);
+	}
+
+	// _this.registry = registryUpdate(_this.registry);
+	// entityDelete(3, &_this.registry);
 	// entityDelete(2, &_this.registry);
-	_this.registry = registryUpdate(_this.registry);
+	// entityDelete(1, &_this.registry);
+	// _this.registry = registryUpdate(_this.registry);
+	// entityDelete(1, &_this.registry);
+	// _this.registry = registryUpdate(_this.registry);
 
 	return _this;
 }
@@ -242,7 +265,21 @@ Game gameInit(Game _this)
 	}
 
 	_this = gameCreateEntities(_this, scaleV);
-	
+	// _this.registry = registryUpdate(_this.registry);
+
+	// {
+	// 	ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
+	// 	loggerLog("cantidad de entities en el sistema de circular mov %d", entities->size);
+	// }
+
+	// entityDelete(4, &_this.registry);
+	// _this.registry = registryUpdate(_this.registry);
+
+	// {
+	// 	ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
+	// 	loggerWarning("cantidad de entities en el sistema de circular mov %d", entities->size);
+	// }
+
 	return _this;
 }
 

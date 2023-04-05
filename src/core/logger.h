@@ -11,11 +11,8 @@
 
 #define loggerLog(format, ...) \
  	do { \
-        time_t t = time(NULL); \
-        struct tm tm = *localtime(&t); \
         char prefix[80]; \
-        sprintf(prefix, GREEN "[%02d:%02d:%02d] %s:%d", \
-               tm.tm_hour, tm.tm_min, tm.tm_sec, \
+        sprintf(prefix, GREEN "[%s:%d]", \
                __FILE__, __LINE__); \
         int prefix_length = strlen(prefix); \
         printf("%s", prefix); \
@@ -26,11 +23,8 @@
 
 #define loggerError(format, ...) \
  	do { \
-        time_t t = time(NULL); \
-        struct tm tm = *localtime(&t); \
         char prefix[80]; \
-        sprintf(prefix, RED "[%02d:%02d:%02d] %s:%d", \
-               tm.tm_hour, tm.tm_min, tm.tm_sec, \
+        sprintf(prefix, RED "[%s:%d]", \
                __FILE__, __LINE__); \
         int prefix_length = strlen(prefix); \
         printf("%s", prefix); \
@@ -41,11 +35,8 @@
 
 #define loggerWarning(format, ...) \
  	do { \
-        time_t t = time(NULL); \
-        struct tm tm = *localtime(&t); \
         char prefix[80]; \
-        sprintf(prefix, YELLOW "[%02d:%02d:%02d] %s:%d", \
-               tm.tm_hour, tm.tm_min, tm.tm_sec, \
+        sprintf(prefix, YELLOW "[%s:%d]", \
                __FILE__, __LINE__); \
         int prefix_length = strlen(prefix); \
         printf("%s", prefix); \
