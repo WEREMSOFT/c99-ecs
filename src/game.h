@@ -163,13 +163,13 @@ static Game gameCreateEntities(Game _this, Vector2 scaleV)
 	int baseEntityId = _this.registry.entityCount + 1;
 
 	float phase = 0.;
-	ADD_ENTITY(1, 1);
-	ADD_ENTITY(2, 1);
-	ADD_ENTITY(3, 1);
-	ADD_ENTITY(4, 1);
-	ADD_ENTITY(5, 1);
+	// ADD_ENTITY(1, 1);
+	// ADD_ENTITY(2, 1);
+	// ADD_ENTITY(3, 1);
+	// ADD_ENTITY(4, 1);
+	// ADD_ENTITY(5, 1);
 
-	// _this.registry = registryDeleteEntity(_this.registry, 0);
+	_this.registry = registryDeleteEntity(_this.registry, 0);
 
 	return _this;
 }
@@ -195,11 +195,11 @@ Game gameInit(Game _this)
 
 		loadCSV("./assets/tilemaps/jungle.map", rows, cols, tilemap);
 
-		// for(int y = 0; y < rows; y+=2)
-		for(int y = 0; y < 2; y++)
+		for(int y = 0; y < rows; y++)
+		// for(int y = 0; y < 2; y++)
 		{
-			// for(int x = 0; x < cols; x+=2)
-			for(int x = 0; x < 2; x++)
+			for(int x = 0; x < cols; x++)
+			// for(int x = 0; x < 2; x++)
 			{
 				int entityId = entityCreate(&_this.registry);
 				entityAddTag(entityId, _this.registry, TAG_TILE);

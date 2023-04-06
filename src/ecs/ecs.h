@@ -103,21 +103,10 @@ void entityRemoveComponent(int entityId, int componentId, Registry registry)
 	arrayDeleteElement(registry.components[componentId], componentIndex);
 }
 
-void entityToComponentCorrectIndex(ArrayHeader* entityToComponent, int componentId)
-{
-	for(int i = 0; i < entityToComponent->size; i ++)
-	{
-		int* index = arrayGetElementAt(entityToComponent, i);
-		if(*index >= componentId)
-		{
-			*index -= 1;
-		}
-	}
-}
-
 void registryDeleteComponentsForEntity(Registry registry, int entityId)
 {
 	for(int componentId = 0; componentId < COMPONENT_COUNT; componentId++)
+	// int componentId = COMPONENT_SPRITE;
 	{
 		if(entityHasComponent(entityId, componentId, registry))
 		{
@@ -129,7 +118,6 @@ void registryDeleteComponentsForEntity(Registry registry, int entityId)
 				if(*index > componentIndex)
 					(*index)--;
 			}
-
 		}
 	}
 }
@@ -139,11 +127,10 @@ Registry registryDeleteEntity(Registry registry, int entityId)
 	registryDeleteComponentsForEntity(registry, entityId);
 
 	for(int componentId = 0; componentId < COMPONENT_COUNT; componentId++)
+	// int componentId = 0;
 	{
 		arrayDeleteElement(registry.entity2Component[componentId], entityId);
 	}
-	
-	
 
 	arrayDeleteElement(registry.componentSignatures, entityId);
 
