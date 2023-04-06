@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include "logger.h"
 
 #define myMalloc malloc
 #define myFree free
@@ -51,7 +52,7 @@ void arrayClear(ArrayHeader* _this)
 
 ArrayHeader* arrayAddElement(ArrayHeader* _this, const void* element)
 {
-
+	if(element < 1024) loggerWarn("the pointer doesn't look like a pointer");
 	if(_this->size == _this->capacity)
 	{
 		ArrayHeader* biggerArray = arrayCreate(_this->capacity * 2, _this->dataTypeSize);

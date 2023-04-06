@@ -127,8 +127,7 @@ void registryDeleteComponentsForEntity(Registry registry, int entityId)
 			{
 				int* index = arrayGetElementAt(registry.entity2Component[componentId], mapIndex);
 				if(*index > componentIndex)
-					*index--;
-				loggerLog("index %d", *index);
+					(*index)--;
 			}
 
 		}

@@ -16,7 +16,7 @@
                __FILE__, __LINE__); \
         int prefix_length = strlen(prefix); \
         printf("%s", prefix); \
-        printf("%*s:", (int)(40 - prefix_length - strlen(RESET)), ""); \
+        printf("%*s", (int)(40 - prefix_length - strlen(RESET)), ""); \
         printf(format, ##__VA_ARGS__); \
         printf(RESET "\n"); \
     } while (0)
@@ -28,7 +28,7 @@
                __FILE__, __LINE__); \
         int prefix_length = strlen(prefix); \
         printf("%s", prefix); \
-        printf("%*s:", (int)(40 - prefix_length - strlen(RESET)), ""); \
+        printf("%*s", (int)(40 - prefix_length - strlen(RESET)), ""); \
         printf(format, ##__VA_ARGS__); \
         printf(RESET "\n"); \
     } while (0)
@@ -40,7 +40,7 @@
                __FILE__, __LINE__); \
         int prefix_length = strlen(prefix); \
         printf("%s", prefix); \
-        printf("%*s:", (int)(40 - prefix_length - strlen(RESET)), ""); \
+        printf("%*s", (int)(40 - prefix_length - strlen(RESET)), ""); \
         printf(format, ##__VA_ARGS__); \
         printf(RESET "\n"); \
     } while (0)
