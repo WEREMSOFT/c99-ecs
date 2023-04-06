@@ -48,6 +48,10 @@ void arrayDestroy(void *array)
 void arrayClear(ArrayHeader* _this)
 {
 	_this->size = 0;
+
+	#ifdef __DEBUG_BUILD__
+		memset(&_this->data[0], 0, _this->capacity * _this->dataTypeSize);
+	#endif
 }
 
 ArrayHeader* arrayAddElement(ArrayHeader* _this, const void* element)
@@ -111,7 +115,15 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 	*pivot = *((Pivot*)element);
 	
 	// The size of the array must be at least equal to index;
-	_this->size = index + 1;
+	if(_this->size == index)
+	{
+		_this->size++;
+	}
+
+	if(_this->size < index)
+	{
+		_this->size = index + 1;
+	}
 
 	return _this;
 }
@@ -167,6 +179,10 @@ void arrayDeleteElement(ArrayHeader *_this, int elementIndex)
 	int lastIndex = _this->size - 1;
 	Pivot* lastElement = (Pivot *)&_this->data[lastIndex * _this->dataTypeSize];
 	*((Pivot *)&_this->data[elementIndex * _this->dataTypeSize]) = *lastElement;
+
+	#ifdef __DEBUG_BUILD__
+		memset(&_this->data[lastIndex * _this->dataTypeSize], 0, _this->dataTypeSize);
+	#endif
 
 	_this->size--;
 }

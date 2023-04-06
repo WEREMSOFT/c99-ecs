@@ -6,20 +6,20 @@
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
 
-enum ComponentEnum
+typedef enum
 {
 	COMPONENT_SPRITE,
 	COMPONENT_TRANSFORM,
 	COMPONENT_CIRCULAR_MOVEMENT,
 	COMPONENT_COUNT,
-};
+} ComponentEnum;
 
-enum SystemEnum
+typedef enum
 {
 	SYSTEM_RENDER,
 	SYSTEM_CIRCULAR_MOVEMENT,
 	SYSTEM_COUNT,
-};
+} SystemEnum;
 
 enum TagsEnum
 {
@@ -139,43 +139,24 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
     fclose(fp);
 }
 
-#define ADD_ENTITY(x, y) \
-	{\
-		phase += .3;\
-		int entityId = entityCreate(&_this.registry);\
-		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 0, 0, 0, 2.);\
-		entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);\
-		TransformComponent transformComponent = {{10, 10}, scaleV, 0};\
-		entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);\
-		CircularMovementComponent cmc = {.phase = phase, .center = {(x) * 100., (y) * 100.}, .radius = 100. };\
-		entityAddComponent(entityId, &_this.registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);\
-	}
-
-static Game gameCreateEntities(Game _this, Vector2 scaleV)
+Registry addEntity(int x, int y, Registry registry, Vector2 scaleV) 
 {
-	Registry* registry = &_this.registry;
-	_this.registry = registryUpdate(_this.registry);
-	{
-		ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
-		loggerLog("cantidad de entities en el sistema de circular mov %d", entities->size);
-	}
-	
-	int baseEntityId = _this.registry.entityCount + 1;
-
-	float phase = 0.;
-	// ADD_ENTITY(1, 1);
-	// ADD_ENTITY(2, 1);
-	// ADD_ENTITY(3, 1);
-	// ADD_ENTITY(4, 1);
-	// ADD_ENTITY(5, 1);
-
-	_this.registry = registryDeleteEntity(_this.registry, 0);
-
-	return _this;
+	static float phase;
+	phase += .3;
+	int entityId = entityCreate(&registry);
+	SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 0, 0, 0, 2.);
+	entityAddComponent(entityId, &registry, &spriteComponent, COMPONENT_SPRITE);
+	TransformComponent transformComponent = {{10, 10}, scaleV, 0};
+	entityAddComponent(entityId, &registry, &transformComponent, COMPONENT_TRANSFORM);
+	CircularMovementComponent cmc = {.phase = phase, .center = {(x) * 100., (y) * 100.}, .radius = 100. };
+	entityAddComponent(entityId, &registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
+	return registry;
 }
 
 Game gameInit(Game _this)
 {
+	Registry registry = _this.registry;
+
 	#define CREATE_TEXTURE_ASSET(textureId, imagePath) _this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, (textureId), (imagePath))
 	CREATE_TEXTURE_ASSET(TEXTURE_TILE_MAP, "./assets/tilemaps/jungle.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_TREE, "./assets/images/tree.png");
@@ -196,10 +177,8 @@ Game gameInit(Game _this)
 		loadCSV("./assets/tilemaps/jungle.map", rows, cols, tilemap);
 
 		for(int y = 0; y < rows; y++)
-		// for(int y = 0; y < 2; y++)
 		{
-			for(int x = 0; x < cols; x++)
-			// for(int x = 0; x < 2; x++)
+			for(int x = 0; x < cols; x+=2)
 			{
 				int entityId = entityCreate(&_this.registry);
 				entityAddTag(entityId, _this.registry, TAG_TILE);
@@ -218,7 +197,21 @@ Game gameInit(Game _this)
 		}
 	}
 
-	_this = gameCreateEntities(_this, scaleV);
+	float phase = 0.;
+	int entityToDelete = _this.registry.entityCount;
+	_this.registry = addEntity(1, 1, _this.registry, scaleV);
+	_this.registry = addEntity(2, 1, _this.registry, scaleV);
+	_this.registry = addEntity(3, 1, _this.registry, scaleV);
+	_this.registry = addEntity(4, 1, _this.registry, scaleV);
+	_this.registry = addEntity(5, 1, _this.registry, scaleV);
+	// ADD_ENTITY(3, 1);
+	// ADD_ENTITY(4, 1);
+	// ADD_ENTITY(5, 1);
+
+	_this.registry = registryDeleteEntity(_this.registry, 1);
+	// _this.registry = registryDeleteEntity(_this.registry, 5);
+	// _this.registry = registryDeleteEntity(_this.registry, entityToDelete);
+	_this.registry = registryUpdate(_this.registry);
 	// _this.registry = registryUpdate(_this.registry);
 
 	// {

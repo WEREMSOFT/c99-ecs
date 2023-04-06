@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define __DEBUG_BUILD__
+
 #include "core/array.h"
 #include "core/bitset.h"
 #include "core/logger.h"
