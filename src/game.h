@@ -211,6 +211,10 @@ Game gameInit(Game _this)
 	// ADD_ENTITY(5, 1);
 
 	_this.registry = registryDeleteEntity(_this.registry, 1);
+	_this.registry = registryDeleteEntity(_this.registry, 1);
+	_this.registry = registryDeleteEntity(_this.registry, 1);
+	_this.registry = registryDeleteEntity(_this.registry, 1);
+	_this.registry = registryDeleteEntity(_this.registry, 1);
 	// _this.registry = registryDeleteEntity(_this.registry, 5);
 	// _this.registry = registryDeleteEntity(_this.registry, entityToDelete);
 	_this.registry = registryUpdate(_this.registry);
