@@ -20,7 +20,7 @@ typedef struct
 	Bitset systemInterestSignatures[SYSTEM_COUNT];
 } Registry;
 
-int entityCreate(Registry* registry)
+int registryCreateEntity(Registry* registry)
 {
 	return registry->entityCount++;
 }

@@ -143,7 +143,7 @@ Registry addEntity(int x, int y, Registry registry, Vector2 scaleV)
 {
 	static float phase;
 	phase += .3;
-	int entityId = entityCreate(&registry);
+	int entityId = registryCreateEntity(&registry);
 	SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 0, 0, 0, 2.);
 	entityAddComponent(entityId, &registry, &spriteComponent, COMPONENT_SPRITE);
 	TransformComponent transformComponent = {{10, 10}, scaleV, 0};
@@ -177,10 +177,12 @@ Game gameInit(Game _this)
 		loadCSV("./assets/tilemaps/jungle.map", rows, cols, tilemap);
 
 		for(int y = 0; y < rows; y++)
+		// for(int y = 0; y < 1; y++)
 		{
 			for(int x = 0; x < cols; x+=2)
+			// for(int x = 0; x < 1; x+=2)
 			{
-				int entityId = entityCreate(&_this.registry);
+				int entityId = registryCreateEntity(&_this.registry);
 				entityAddTag(entityId, _this.registry, TAG_TILE);
 
 				SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};;
