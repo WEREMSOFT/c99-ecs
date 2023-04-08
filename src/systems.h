@@ -23,18 +23,18 @@ void circularMovementSystem(Registry registry, float deltaTime)
 void renderSystem(Registry registry, AssetStore assetStore, SDL_Renderer* renderer)
 {
 	ArrayHeader* entities = systemGetEntities(SYSTEM_RENDER, registry);
-	// if(registry.isDirty)
-	// {
-	// 	int comp(const int* elm1, const int* elm2)
-	// 	{
-	// 		SpriteComponent* sprite1 = entityGetComponent(*elm1, registry, COMPONENT_SPRITE);
-	// 		SpriteComponent* sprite2 = entityGetComponent(*elm2, registry, COMPONENT_SPRITE);
+	// Sort entities by zindex
+	{
+		int comp(const int* elm1, const int* elm2) 
+		{
+			SpriteComponent* sprite1 = entityGetComponent(*elm1, registry, COMPONENT_SPRITE);
+			SpriteComponent* sprite2 = entityGetComponent(*elm2, registry, COMPONENT_SPRITE);
 
-	// 		return sprite1->zIndex - sprite2->zIndex;
-	// 	}
+			return sprite1->zIndex - sprite2->zIndex;
+		}
 
-	// 	qsort(entities->data, entities->size, entities->dataTypeSize, comp);
-	// }
+		qsort(entities->data, entities->size, entities->dataTypeSize, comp);
+	}
 
 	for(int entityPerSystemIndex = 0; entityPerSystemIndex < entities->size; entityPerSystemIndex++)
 	{

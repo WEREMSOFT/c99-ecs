@@ -21,25 +21,25 @@ typedef struct
 	bool isDirty;
 } Registry;
 
-int entityCreate(Registry* registry)
+int registryCreateEntity(Registry* _this)
 {
-	return registry->entityCount++;
+	return _this->entityCount++;
 }
 
-Bitset entityGetComponentSignature(int entityId, Registry registry)
+Bitset registryGetEntitySignature(Registry _this, int entityId)
 {
 	Bitset returnValue = 0;
-	returnValue = *(Bitset *)arrayGetElementAt(registry.componentSignatures, entityId);
+	returnValue = *(Bitset *)arrayGetElementAt(_this.componentSignatures, entityId);
 	return returnValue;
 }
 
 bool entityHasComponent(int entityId, ComponentEnum componentId, Registry registry)
 {
-	Bitset componentSignature = entityGetComponentSignature(entityId, registry);
+	Bitset componentSignature = registryGetEntitySignature(registry, entityId);
 	return bitsetIsSet(componentSignature, componentId);
 }
 
-void entityDelete(int entityId, Registry* registry)
+void registryDeleteEntity(int entityId, Registry* registry)
 {
 	registry->isDirty = true;
 	// a. delete component at entityId
@@ -113,9 +113,9 @@ ArrayHeader* systemGetEntities(SystemEnum systemId, Registry registry)
 
 bool systemIsInterestedInEntity(SystemEnum systemId, int entityId, Registry registry)
 {
-	Bitset componentSignature = entityGetComponentSignature(entityId, registry);
+	Bitset entitySignature = registryGetEntitySignature(registry, entityId);
 	Bitset systemInterestSignature = registry.systemInterestSignatures[systemId];
-	return (componentSignature & systemInterestSignature) == systemInterestSignature;
+	return (entitySignature & systemInterestSignature) == systemInterestSignature;
 }
 
 void registryCleanSystemArrays(Registry registry)
