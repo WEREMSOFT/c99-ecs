@@ -174,6 +174,9 @@ void gameInit(Game* _this)
 	CREATE_TEXTURE_ASSET(TEXTURE_TRUCK_FORD_DOWN, "./assets/images/tank-tiger-up.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_TRUCK_FORD_DOWN, "./assets/images/tank-tiger-up.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_LANDING_BASE, "./assets/images/landing-base.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_LANDING_BASE, "./assets/images/landing-base.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_CHOPPER, "./assets/images/chopper-spritesheet.png");
+
 	#undef CREATE_TEXTURE_ASSET
 
 	float scale = 1.;
@@ -213,6 +216,18 @@ void gameInit(Game* _this)
 	registryAddEntity(&_this->registry, 3, 1, scaleV);
 	registryAddEntity(&_this->registry, 4, 1, scaleV);
 	registryAddEntity(&_this->registry, 5, 1, scaleV);
+
+	// ADD ANIMATED CHOPPER
+	{
+		int entityId = registryCreateEntity(_this);
+		SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_CHOPPER, 32, 32, 10, 0, 0, 2.);
+		entityAddComponent(entityId, _this, &spriteComponent, COMPONENT_SPRITE);
+		TransformComponent transformComponent = {{100, 100}, scaleV, 0};
+		entityAddComponent(entityId, _this, &transformComponent, COMPONENT_TRANSFORM);
+
+		AnimationComponent animationComponent = animationComponentCreate(2, 7, true);
+		entityAddComponent(entityId, _this, &animationComponent, COMPONENT_ANIMATION);
+	}
 
 	return _this;
 }
