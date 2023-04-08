@@ -43,6 +43,8 @@ Registry registryCreate()
 {
 	Registry returnValue = {0};
 
+	returnValue.isDirty = true;
+
 	returnValue.componentSignatures = arrayCreate(MAX_ENTITIES, sizeof(Bitset));
 	returnValue.tags = arrayCreateAndInitToZero(MAX_ENTITIES, sizeof(Bitset));
 	returnValue.tags->size = returnValue.tags->capacity;
@@ -143,7 +145,7 @@ Registry addEntity(int x, int y, Registry registry, Vector2 scaleV)
 {
 	static float phase;
 	phase += .3;
-	int entityId = registryCreateEntity(&registry);
+	int entityId = entityCreate(&registry);
 	SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 0, 0, 0, 2.);
 	entityAddComponent(entityId, &registry, &spriteComponent, COMPONENT_SPRITE);
 	TransformComponent transformComponent = {{10, 10}, scaleV, 0};
@@ -182,7 +184,7 @@ Game gameInit(Game _this)
 			for(int x = 0; x < cols; x+=2)
 			// for(int x = 0; x < 1; x+=2)
 			{
-				int entityId = registryCreateEntity(&_this.registry);
+				int entityId = entityCreate(&_this.registry);
 				entityAddTag(entityId, _this.registry, TAG_TILE);
 
 				SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};;
@@ -206,17 +208,12 @@ Game gameInit(Game _this)
 	_this.registry = addEntity(3, 1, _this.registry, scaleV);
 	_this.registry = addEntity(4, 1, _this.registry, scaleV);
 	_this.registry = addEntity(5, 1, _this.registry, scaleV);
-	// ADD_ENTITY(3, 1);
-	// ADD_ENTITY(4, 1);
-	// ADD_ENTITY(5, 1);
 
-	_this.registry = registryDeleteEntity(_this.registry, 1);
-	_this.registry = registryDeleteEntity(_this.registry, 1);
-	_this.registry = registryDeleteEntity(_this.registry, 1);
-	_this.registry = registryDeleteEntity(_this.registry, 1);
-	_this.registry = registryDeleteEntity(_this.registry, 1);
-	// _this.registry = registryDeleteEntity(_this.registry, 5);
-	// _this.registry = registryDeleteEntity(_this.registry, entityToDelete);
+	_this.registry = entityDelete(1, _this.registry);
+	_this.registry = entityDelete(1, _this.registry);
+	_this.registry = entityDelete(1, _this.registry);
+	_this.registry = entityDelete(1, _this.registry);
+	_this.registry = entityDelete(1, _this.registry);
 	_this.registry = registryUpdate(_this.registry);
 	// _this.registry = registryUpdate(_this.registry);
 

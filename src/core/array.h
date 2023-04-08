@@ -56,7 +56,9 @@ void arrayClear(ArrayHeader* _this)
 
 ArrayHeader* arrayAddElement(ArrayHeader* _this, const void* element)
 {
-	if(element < 1024) loggerWarn("the pointer doesn't look like a pointer");
+	#ifdef __DEBUG_BUILD__
+	assert(element > 1024 && "the pointer doesn't look like a pointer");
+	#endif
 	if(_this->size == _this->capacity)
 	{
 		ArrayHeader* biggerArray = arrayCreate(_this->capacity * 2, _this->dataTypeSize);
