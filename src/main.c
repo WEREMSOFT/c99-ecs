@@ -17,9 +17,9 @@ int main()
 {
 	Game game = gameCreate();
 
-	game = gameInit(game);
+	gameInit(&game);
 
-	game = gameRun(game);
+	gameRun(&game);
 
 	gameDestroy(game);
 	

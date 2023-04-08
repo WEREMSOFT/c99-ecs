@@ -32,7 +32,7 @@ typedef struct
 
 #include <SDL2/SDL_image.h>
 
-AssetStore assetStoreClearAssets(AssetStore _this)
+void assetStoreClearAssets(AssetStore _this)
 {
 	for(int i = 0; i < TEXTURE_COUNT; i++)
 	{
@@ -43,21 +43,19 @@ AssetStore assetStoreClearAssets(AssetStore _this)
 	{
 		TTF_CloseFont(_this.fonts[i]);
 	}
-	return _this;
 }
 
 void assetStoreDestroy(AssetStore _this)
 {
-	_this = assetStoreClearAssets(_this);
+	assetStoreClearAssets(_this);
 }
 
-AssetStore assetStoreAddTexture(AssetStore _this, SDL_Renderer* renderer, TextureIdEnum assetId, const char* filePath)
+void assetStoreAddTexture(AssetStore* _this, SDL_Renderer* renderer, TextureIdEnum assetId, const char* filePath)
 {
 	SDL_Surface* surface = IMG_Load(filePath);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
-	_this.textures[(int)assetId] = texture;
-	return _this;
+	_this->textures[(int)assetId] = texture;
 }
 
 SDL_Texture* assetStoreGetTexture(AssetStore _this, TextureIdEnum assetId)
@@ -65,10 +63,9 @@ SDL_Texture* assetStoreGetTexture(AssetStore _this, TextureIdEnum assetId)
 	return _this.textures[(int)assetId];
 }
 
-AssetStore assetStoreAddFont(AssetStore _this, FontIdEnum assetId, char* filePath, int fontSize)
+void  assetStoreAddFont(AssetStore* _this, FontIdEnum assetId, char* filePath, int fontSize)
 {
-	_this.fonts[(int)assetId] = TTF_OpenFont(filePath, fontSize);
-	return _this;
+	_this->fonts[(int)assetId] = TTF_OpenFont(filePath, fontSize);
 }
 
 TTF_Font* assetStoreGetFont(AssetStore _this, const FontIdEnum assetId)

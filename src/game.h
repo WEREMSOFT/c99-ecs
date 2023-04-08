@@ -154,11 +154,11 @@ void registryAddEntity(Registry* _this, int x, int y, Vector2 scaleV)
 	entityAddComponent(entityId, _this, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
 }
 
-Game gameInit(Game _this)
+void gameInit(Game* _this)
 {
-	Registry registry = _this.registry;
+	Registry registry = _this->registry;
 
-	#define CREATE_TEXTURE_ASSET(textureId, imagePath) _this.assetStore = assetStoreAddTexture(_this.assetStore, _this.renderer, (textureId), (imagePath))
+	#define CREATE_TEXTURE_ASSET(textureId, imagePath) assetStoreAddTexture(&_this->assetStore, _this->renderer, (textureId), (imagePath))
 	CREATE_TEXTURE_ASSET(TEXTURE_TILE_MAP, "./assets/tilemaps/jungle.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_TREE, "./assets/images/tree.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_TANK_TIGER_UP, "./assets/images/tank-tiger-up.png");
@@ -183,31 +183,31 @@ Game gameInit(Game _this)
 			for(int x = 0; x < cols; x++)
 			// for(int x = 0; x < 1; x+=2)
 			{
-				int entityId = entityCreate(&_this.registry);
-				entityAddTag(entityId, _this.registry, TAG_TILE);
+				int entityId = entityCreate(&_this->registry);
+				entityAddTag(entityId, _this->registry, TAG_TILE);
 
 				SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};;
 				SDL_Rect destRect = (SDL_Rect){ x * 32, y * 32, 32, 32 };
 				
 				SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TILE_MAP, 32, 32, 0, srcRect.x, srcRect.y, scale);
-				entityAddComponent(entityId, &_this.registry, &spriteComponent, COMPONENT_SPRITE);
+				entityAddComponent(entityId, &_this->registry, &spriteComponent, COMPONENT_SPRITE);
 
 				Vector2 position = {destRect.x * scale, destRect.y * scale};
 
 				TransformComponent transformComponent = {position, scaleV, 0};
-				entityAddComponent(entityId, &_this.registry, &transformComponent, COMPONENT_TRANSFORM);
+				entityAddComponent(entityId, &_this->registry, &transformComponent, COMPONENT_TRANSFORM);
 			}
 		}
 	}
 
 	float phase = 0.;
-	registryAddEntity(&_this.registry, 1, 1, scaleV);
-	registryAddEntity(&_this.registry, 2, 1, scaleV);
-	registryAddEntity(&_this.registry, 3, 1, scaleV);
-	registryAddEntity(&_this.registry, 4, 1, scaleV);
-	registryAddEntity(&_this.registry, 5, 1, scaleV);
+	registryAddEntity(&_this->registry, 1, 1, scaleV);
+	registryAddEntity(&_this->registry, 2, 1, scaleV);
+	registryAddEntity(&_this->registry, 3, 1, scaleV);
+	registryAddEntity(&_this->registry, 4, 1, scaleV);
+	registryAddEntity(&_this->registry, 5, 1, scaleV);
 
-	entityDelete(1, &_this.registry);
+	entityDelete(1, &_this->registry);
 	
 	return _this;
 }
@@ -219,7 +219,7 @@ void gameDestroy(Game _this)
 	SDL_Quit();
 }
 
-Game gameProcessInput(Game _this)
+void gameProcessInput(Game* _this)
 {
 	SDL_Event event;
 
@@ -229,17 +229,16 @@ Game gameProcessInput(Game _this)
 		switch (event.type)
 		{
 		case SDL_QUIT:
-			_this.isRunning = false;
+			_this->isRunning = false;
 			break;
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_ESCAPE)
 			{
-				_this.isRunning = false;
+				_this->isRunning = false;
 			}
 			break;
 		}
 	}
-	return _this;
 }
 
 void gameRender(Game _this)
@@ -260,26 +259,24 @@ static void delayFrameBasedOnElapsedTime(Game _this)
 		SDL_Delay(timeToWait);
 }
 
-Game gameUpdate(Game _this)
+void gameUpdate(Game* _this)
 {
-	delayFrameBasedOnElapsedTime(_this);
+	delayFrameBasedOnElapsedTime(*_this);
 
-	float deltaTime = (SDL_GetTicks() - _this.millisecondsPreviousFrame) / 1000.f;
-	_this.millisecondsPreviousFrame = SDL_GetTicks();
+	float deltaTime = (SDL_GetTicks() - _this->millisecondsPreviousFrame) / 1000.f;
+	_this->millisecondsPreviousFrame = SDL_GetTicks();
 
-	circularMovementSystem(_this.registry, deltaTime);
+	circularMovementSystem(_this->registry, deltaTime);
 
-	_this.registry = registryUpdate(_this.registry);
-	return _this;
+	registryUpdate(&_this->registry);
 }
 
-Game gameRun(Game _this)
+void gameRun(Game* _this)
 {
-	while (_this.isRunning)
+	while (_this->isRunning)
 	{
-		_this = gameProcessInput(_this);
-		_this = gameUpdate(_this);
-		gameRender(_this);
+		gameProcessInput(_this);
+		gameUpdate(_this);
+		gameRender(*_this);
 	}
-	return _this;
 }

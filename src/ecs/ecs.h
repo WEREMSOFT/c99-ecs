@@ -132,23 +132,22 @@ void systemAddEntity(SystemEnum systemId, int entityId, Registry registry)
 	 registry.entitiesPerSystem[systemId] = arrayAddElement(registry.entitiesPerSystem[systemId], &entityId);
 }
 
-Registry registryUpdate(Registry registry)
+void registryUpdate(Registry* registry)
 {
-	if(!registry.isDirty) return registry;
-	registryCleanSystemArrays(registry);
+	if(!registry->isDirty) return registry;
+	registryCleanSystemArrays(*registry);
 
-	for(int entityId = 0; entityId < registry.entityCount; entityId++)
+	for(int entityId = 0; entityId < registry->entityCount; entityId++)
 	{
 		for(SystemEnum systemId = 0; systemId < SYSTEM_COUNT; systemId++)
 		{
-			if(systemIsInterestedInEntity(systemId, entityId, registry))
+			if(systemIsInterestedInEntity(systemId, entityId, *registry))
 			{
-				systemAddEntity(systemId, entityId, registry);
+				systemAddEntity(systemId, entityId, *registry);
 			}
 		}
 	}
-	registry.isDirty = false;
-	return registry;
+	registry->isDirty = false;
 }
 
 Registry registryAddEntityToGroup(Registry _this, int entityId, int groupId)
