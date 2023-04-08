@@ -37,7 +37,7 @@ typedef struct
 // SPRITE
 typedef struct
 {
-int width;
+	int width;
 	int height;
 	int zIndex;
 	bool isFixed;

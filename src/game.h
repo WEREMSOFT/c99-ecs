@@ -146,7 +146,7 @@ Registry addEntity(int x, int y, Registry registry, Vector2 scaleV)
 	static float phase;
 	phase += .3;
 	int entityId = entityCreate(&registry);
-	SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 0, 0, 0, 2.);
+	SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 10, 0, 0, 2.);
 	entityAddComponent(entityId, &registry, &spriteComponent, COMPONENT_SPRITE);
 	TransformComponent transformComponent = {{10, 10}, scaleV, 0};
 	entityAddComponent(entityId, &registry, &transformComponent, COMPONENT_TRANSFORM);
@@ -181,7 +181,7 @@ Game gameInit(Game _this)
 		for(int y = 0; y < rows; y++)
 		// for(int y = 0; y < 1; y++)
 		{
-			for(int x = 0; x < cols; x+=2)
+			for(int x = 0; x < cols; x++)
 			// for(int x = 0; x < 1; x+=2)
 			{
 				int entityId = entityCreate(&_this.registry);
@@ -202,28 +202,20 @@ Game gameInit(Game _this)
 	}
 
 	float phase = 0.;
-	int entityToDelete = _this.registry.entityCount;
 	_this.registry = addEntity(1, 1, _this.registry, scaleV);
 	_this.registry = addEntity(2, 1, _this.registry, scaleV);
 	_this.registry = addEntity(3, 1, _this.registry, scaleV);
 	_this.registry = addEntity(4, 1, _this.registry, scaleV);
 	_this.registry = addEntity(5, 1, _this.registry, scaleV);
 
-	_this.registry = entityDelete(1, _this.registry);
-	_this.registry = entityDelete(1, _this.registry);
-	_this.registry = entityDelete(1, _this.registry);
-	_this.registry = entityDelete(1, _this.registry);
-	_this.registry = entityDelete(1, _this.registry);
-	_this.registry = registryUpdate(_this.registry);
-	// _this.registry = registryUpdate(_this.registry);
-
 	// {
 	// 	ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
 	// 	loggerLog("cantidad de entities en el sistema de circular mov %d", entities->size);
 	// }
 
-	// entityDelete(4, &_this.registry);
-	// _this.registry = registryUpdate(_this.registry);
+	_this.registry = registryUpdate(_this.registry);
+	entityDelete(4, _this.registry);
+	_this.registry = registryUpdate(_this.registry);
 
 	// {
 	// 	ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
