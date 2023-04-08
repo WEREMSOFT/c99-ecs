@@ -39,38 +39,37 @@ bool entityHasComponent(int entityId, ComponentEnum componentId, Registry regist
 	return bitsetIsSet(componentSignature, componentId);
 }
 
-Registry entityDelete(int entityId, Registry registry)
+void entityDelete(int entityId, Registry* registry)
 {
-	registry.isDirty = true;
+	registry->isDirty = true;
 	// a. delete component at entityId
 	for(ComponentEnum componentId = 0; componentId < COMPONENT_COUNT; componentId++)
 	{
-		if(entityHasComponent(entityId, componentId, registry))
+		if(entityHasComponent(entityId, componentId, *registry))
 		{
-			int componentIndex = arrayGetElementAtI(registry.entity2Component[componentId], entityId);
-			ComponentEnum lastEntityIndex = registry.components[componentId]->size - 1;
-			arrayDeleteElement(registry.components[componentId], componentIndex);
+			int componentIndex = arrayGetElementAtI(registry->entity2Component[componentId], entityId);
+			ComponentEnum lastEntityIndex = registry->components[componentId]->size - 1;
+			arrayDeleteElement(registry->components[componentId], componentIndex);
 			// b. update maping with the new location of component in a and only the location of the component in a.
-			for(int mapId = 0; mapId < registry.entity2Component[componentId]->size; mapId++)
+			for(int mapId = 0; mapId < registry->entity2Component[componentId]->size; mapId++)
 			{
-				int compMapId = arrayGetElementAtI(registry.entity2Component[componentId], mapId);
+				int compMapId = arrayGetElementAtI(registry->entity2Component[componentId], mapId);
 				if(compMapId == lastEntityIndex)
 				{
-					int* oldMapIndex = arrayGetElementAt(registry.entity2Component[componentId], mapId);
+					int* oldMapIndex = arrayGetElementAt(registry->entity2Component[componentId], mapId);
 					(*oldMapIndex) = componentIndex;
 				}
 			}
 		}
 		// c. delete the maping entry at entityId
-		arrayDeleteElement(registry.entity2Component[componentId], entityId);
+		arrayDeleteElement(registry->entity2Component[componentId], entityId);
 	}
 
 	// d. delete the signature at entityId
-	arrayDeleteElement(registry.componentSignatures, entityId);
+	arrayDeleteElement(registry->componentSignatures, entityId);
 
 	// e. decrement the entity count
-	registry.entityCount--;
-	return registry;
+	registry->entityCount--;
 }
 
 void* entityGetComponent(int entityId, Registry registry, ComponentEnum componentId)

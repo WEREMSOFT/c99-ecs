@@ -141,18 +141,17 @@ static void loadCSV(char* filename, int rows, int cols, int matrix[][cols]) {
     fclose(fp);
 }
 
-Registry addEntity(int x, int y, Registry registry, Vector2 scaleV) 
+void registryAddEntity(Registry* _this, int x, int y, Vector2 scaleV) 
 {
 	static float phase;
 	phase += .3;
-	int entityId = entityCreate(&registry);
+	int entityId = entityCreate(_this);
 	SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TREE, 16, 32, 10, 0, 0, 2.);
-	entityAddComponent(entityId, &registry, &spriteComponent, COMPONENT_SPRITE);
+	entityAddComponent(entityId, _this, &spriteComponent, COMPONENT_SPRITE);
 	TransformComponent transformComponent = {{10, 10}, scaleV, 0};
-	entityAddComponent(entityId, &registry, &transformComponent, COMPONENT_TRANSFORM);
+	entityAddComponent(entityId, _this, &transformComponent, COMPONENT_TRANSFORM);
 	CircularMovementComponent cmc = {.phase = phase, .center = {(x) * 100., (y) * 100.}, .radius = 100. };
-	entityAddComponent(entityId, &registry, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
-	return registry;
+	entityAddComponent(entityId, _this, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
 }
 
 Game gameInit(Game _this)
@@ -202,26 +201,14 @@ Game gameInit(Game _this)
 	}
 
 	float phase = 0.;
-	_this.registry = addEntity(1, 1, _this.registry, scaleV);
-	_this.registry = addEntity(2, 1, _this.registry, scaleV);
-	_this.registry = addEntity(3, 1, _this.registry, scaleV);
-	_this.registry = addEntity(4, 1, _this.registry, scaleV);
-	_this.registry = addEntity(5, 1, _this.registry, scaleV);
+	registryAddEntity(&_this.registry, 1, 1, scaleV);
+	registryAddEntity(&_this.registry, 2, 1, scaleV);
+	registryAddEntity(&_this.registry, 3, 1, scaleV);
+	registryAddEntity(&_this.registry, 4, 1, scaleV);
+	registryAddEntity(&_this.registry, 5, 1, scaleV);
 
-	// {
-	// 	ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
-	// 	loggerLog("cantidad de entities en el sistema de circular mov %d", entities->size);
-	// }
-
-	_this.registry = registryUpdate(_this.registry);
-	entityDelete(4, _this.registry);
-	_this.registry = registryUpdate(_this.registry);
-
-	// {
-	// 	ArrayHeader* entities = systemGetEntities(SYSTEM_CIRCULAR_MOVEMENT, _this.registry);
-	// 	loggerWarning("cantidad de entities en el sistema de circular mov %d", entities->size);
-	// }
-
+	entityDelete(1, &_this.registry);
+	
 	return _this;
 }
 
