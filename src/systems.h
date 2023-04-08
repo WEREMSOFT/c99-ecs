@@ -54,4 +54,19 @@ void renderSystem(Registry registry, AssetStore assetStore, SDL_Renderer* render
 	}
 }
 
+// ANIMATION
+void animationSystem(Registry registry)
+{
+	ArrayHeader* entities = systemGetEntities(SYSTEM_ANIMATION, registry);
+	for(int i = 0; i < entities->size; i++)
+	{
+		int entityId = arrayGetElementAtI(entities, i);
+		AnimationComponent* animation = entityGetComponent(entityId, registry, COMPONENT_ANIMATION);
+		SpriteComponent* sprite = entityGetComponent(entityId, registry, COMPONENT_SPRITE);
+
+		animation->currentFrame = ((SDL_GetTicks() - animation->startTime) * animation->frameRateSpeed / 1000) % animation->numFrames;
+		sprite->srcRect.x = animation->currentFrame * sprite->width;
+	}
+}
+
 #endif

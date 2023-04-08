@@ -1,4 +1,5 @@
 #include "assetStore.h"
+#include <SDL2/SDL.h>
 
 typedef struct
 {
@@ -62,4 +63,28 @@ SpriteComponent spriteComponentCreate(
 	_this.flip = SDL_FLIP_NONE;
 
 	return _this;
+}
+
+// ANIMATION
+
+typedef struct 
+{
+	int numFrames;
+	int currentFrame;
+	int frameRateSpeed;
+	bool isLoop;
+	int startTime;
+} AnimationComponent;
+
+AnimationComponent animationComponentCreate(int numFrames, int frameRateSpeed, bool isLoop)
+{
+	AnimationComponent returnValue = {0};
+
+	returnValue.numFrames = numFrames;
+	returnValue.currentFrame = 1;
+	returnValue.frameRateSpeed = frameRateSpeed;
+	returnValue.isLoop = isLoop;
+	returnValue.startTime = SDL_GetTicks();
+
+	return returnValue;
 }

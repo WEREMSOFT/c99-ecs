@@ -11,6 +11,7 @@ typedef enum
 	COMPONENT_SPRITE,
 	COMPONENT_TRANSFORM,
 	COMPONENT_CIRCULAR_MOVEMENT,
+	COMPONENT_ANIMATION,
 	COMPONENT_COUNT,
 } ComponentEnum;
 
@@ -18,6 +19,7 @@ typedef enum
 {
 	SYSTEM_RENDER,
 	SYSTEM_CIRCULAR_MOVEMENT,
+	SYSTEM_ANIMATION,
 	SYSTEM_COUNT,
 } SystemEnum;
 
@@ -52,6 +54,7 @@ Registry registryCreate()
 	returnValue.components[COMPONENT_TRANSFORM] = arrayCreate(MAX_ENTITIES, sizeof(TransformComponent));
 	returnValue.components[COMPONENT_SPRITE] = arrayCreate(MAX_ENTITIES, sizeof(SpriteComponent));
 	returnValue.components[COMPONENT_CIRCULAR_MOVEMENT] = arrayCreate(MAX_ENTITIES, sizeof(CircularMovementComponent));
+	returnValue.components[COMPONENT_ANIMATION] = arrayCreate(MAX_ENTITIES, sizeof(AnimationComponent));
 
 	for(int i = 0; i < COMPONENT_COUNT; i ++)
 		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
@@ -62,9 +65,15 @@ Registry registryCreate()
 	for(int i = 0; i < SYSTEM_COUNT; i++)
 		returnValue.entitiesPerSystem[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
 
+	// BUILD SYSTEM_CIRCULAR_MOVEMENT SIGNATURE
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_TRANSFORM);
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_CIRCULAR_MOVEMENT);
 
+	// BUILD SYSTEM_ANIMATION SIGNATURE
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_ANIMATION], COMPONENT_SPRITE);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_ANIMATION], COMPONENT_ANIMATION);
+
+	// BUILD SYSTEM_RENDER SIGNATURE
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_RENDER], COMPONENT_SPRITE);
 
 	return returnValue;
@@ -263,7 +272,7 @@ void gameUpdate(Game* _this)
 	_this->millisecondsPreviousFrame = SDL_GetTicks();
 
 	circularMovementSystem(_this->registry, deltaTime);
-
+	animationSystem(_this->registry);
 	registryUpdate(&_this->registry);
 }
 
