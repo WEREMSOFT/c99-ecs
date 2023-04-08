@@ -7,14 +7,12 @@
 
 typedef BITSET_TYPE Bitset;
 
-Bitset bitsetSet(Bitset _this, int bitIndex)
+void bitsetSet(Bitset* _this, int bitIndex)
 {
 	Bitset bitToSet = 1;
 	bitToSet <<= bitIndex;
 
-	_this |= bitToSet;
-
-	return _this;
+	(*_this) |= bitToSet;
 }
 
 int bitsetIsSet(Bitset _this, int bitIndex)
@@ -25,16 +23,15 @@ int bitsetIsSet(Bitset _this, int bitIndex)
 	return (_this & bitToTest) == bitToTest;
 }
 
-Bitset bitsetClear(Bitset _this, int bitIndex)
+void bitsetClear(Bitset* _this, int bitIndex)
 {
 	Bitset bitToSet = 1;
 	
 	bitToSet <<= bitIndex;
 
-	if(_this & bitToSet == 0) return _this;
+	if(*_this & bitToSet == 0) return _this;
 
-	_this ^= bitToSet;
-	return _this;
+	(*_this) ^= bitToSet;
 }
 
 #endif

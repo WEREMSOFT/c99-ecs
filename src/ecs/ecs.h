@@ -78,11 +78,10 @@ void* entityGetComponent(int entityId, Registry registry, ComponentEnum componen
 	return arrayGetElementAt(registry.components[componentId], id);
 }
 
-Bitset entityAddTag(int entityId, Registry registry, int tag)
+void entityAddTag(int entityId, Registry registry, int tag)
 {
 	Bitset *returnValue = arrayGetElementAt(registry.tags, entityId);
-	*returnValue = bitsetSet(*returnValue, tag);
-	return *returnValue;
+	bitsetSet(returnValue, tag);
 }
 
 bool entityHasTag(int entityId, Registry registry, int tag)
@@ -101,7 +100,7 @@ void* entityAddComponent(int entityId, Registry* registry, void* component, Comp
 	int componentIndex = registry->components[componentId]->size - 1;
 	registry->entity2Component[componentId] = arrayAddElementAt(registry->entity2Component[componentId], &componentIndex, entityId);
 	Bitset* signature = arrayGetElementOrCreateAt(registry->componentSignatures, entityId);
-	*signature = bitsetSet(*signature, componentId);
+	bitsetSet(signature, componentId);
 	// The size of the component map must be at least as big as the entities array.
 	return entityGetComponent(entityId, *registry, componentId);
 }  

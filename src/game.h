@@ -62,10 +62,10 @@ Registry registryCreate()
 	for(int i = 0; i < SYSTEM_COUNT; i++)
 		returnValue.entitiesPerSystem[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
 
-	returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_TRANSFORM);
-	returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_CIRCULAR_MOVEMENT);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_TRANSFORM);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_CIRCULAR_MOVEMENT], COMPONENT_CIRCULAR_MOVEMENT);
 
-	returnValue.systemInterestSignatures[SYSTEM_RENDER] = bitsetSet(returnValue.systemInterestSignatures[SYSTEM_RENDER], COMPONENT_SPRITE);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_RENDER], COMPONENT_SPRITE);
 
 	return returnValue;
 }
