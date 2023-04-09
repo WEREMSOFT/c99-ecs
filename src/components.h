@@ -23,7 +23,7 @@ typedef struct
 // RIGIDBODY
 typedef struct 
 {
-	Vector Velocity;
+	Vector velocity;
 } RigidBodyComponent;
 
 // CIRCULAR MOVEMENT
@@ -92,5 +92,6 @@ AnimationComponent animationComponentCreate(int numFrames, int frameRateSpeed, b
 // KEYBOARD COMPONENT
 typedef struct
 {
+	float velocity;
 } KeyboardComponent;
 

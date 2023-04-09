@@ -13,6 +13,7 @@ typedef enum
 	COMPONENT_TRANSFORM,
 	COMPONENT_CIRCULAR_MOVEMENT,
 	COMPONENT_ANIMATION,
+	COMPONENT_RIGID_BODY,
 	COMPONENT_KEYBOARD_CONTROLLER,
 	COMPONENT_COUNT,
 } ComponentEnum;
@@ -22,6 +23,8 @@ typedef enum
 	SYSTEM_RENDER,
 	SYSTEM_CIRCULAR_MOVEMENT,
 	SYSTEM_ANIMATION,
+	SYSTEM_KEYBOARD_CONTROLLER,
+	SYSTEM_MOVEMENT,
 	SYSTEM_COUNT,
 } SystemEnum;
 
@@ -57,6 +60,8 @@ Registry registryCreate()
 	returnValue.components[COMPONENT_SPRITE] = arrayCreate(MAX_ENTITIES, sizeof(SpriteComponent));
 	returnValue.components[COMPONENT_CIRCULAR_MOVEMENT] = arrayCreate(MAX_ENTITIES, sizeof(CircularMovementComponent));
 	returnValue.components[COMPONENT_ANIMATION] = arrayCreate(MAX_ENTITIES, sizeof(AnimationComponent));
+	returnValue.components[COMPONENT_KEYBOARD_CONTROLLER] = arrayCreate(MAX_ENTITIES, sizeof(KeyboardComponent));
+	returnValue.components[COMPONENT_RIGID_BODY] = arrayCreate(MAX_ENTITIES, sizeof(RigidBodyComponent));
 
 	for(int i = 0; i < COMPONENT_COUNT; i ++)
 		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
@@ -77,6 +82,15 @@ Registry registryCreate()
 
 	// BUILD SYSTEM_RENDER SIGNATURE
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_RENDER], COMPONENT_SPRITE);
+
+	// BUILD SYSTEM_KEYBOARD_CONTROLLER SIGNATURE
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_KEYBOARD_CONTROLLER], COMPONENT_KEYBOARD_CONTROLLER);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_KEYBOARD_CONTROLLER], COMPONENT_RIGID_BODY);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_KEYBOARD_CONTROLLER], COMPONENT_TRANSFORM);
+
+	// BUILD MOVEMENT_SYSTEM SIGNATURE
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_RIGID_BODY);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_TRANSFORM);
 
 	return returnValue;
 }
@@ -230,6 +244,14 @@ void gameInit(Game* _this)
 		TransformComponent transformComponent = {{100, 100}, scaleV, 0};
 		entityAddComponent(entityId, _this, &transformComponent, COMPONENT_TRANSFORM);
 
+		KeyboardComponent keyboardComponent = {.velocity = 80.};
+		entityAddComponent(entityId, _this, &keyboardComponent, COMPONENT_KEYBOARD_CONTROLLER);
+
+		RigidBodyComponent rigidBodyComponent = {0};
+		entityAddComponent(entityId, _this, &rigidBodyComponent, COMPONENT_RIGID_BODY);
+
+
+
 		AnimationComponent animationComponent = animationComponentCreate(2, 7, true);
 		entityAddComponent(entityId, _this, &animationComponent, COMPONENT_ANIMATION);
 	}
@@ -258,7 +280,10 @@ void gameProcessInput(Game* _this)
 			break;
 		case SDL_KEYDOWN:
 			Event evt = {.type = EVENT_TYPE_KEY_DOWN}; 
-			evt.data = &event.key.keysym.sym;
+			KeyboardEventData data = {0};
+			data.keyCode = event.key.keysym.sym;
+			data.registry = _this->registry;
+			evt.data = &data;
 
 			eventBusEmmitEvent(_this->eventBus, evt);
 			if (event.key.keysym.sym == SDLK_ESCAPE)
@@ -301,6 +326,7 @@ void gameUpdate(Game* _this)
 
 	circularMovementSystem(_this->registry, deltaTime);
 	animationSystem(_this->registry);
+	movementSystem(_this->registry, deltaTime);
 	registryUpdate(&_this->registry);
 	eventBusCleanEventListeners(_this->eventBus);
 }
