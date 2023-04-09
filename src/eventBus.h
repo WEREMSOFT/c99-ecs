@@ -13,7 +13,7 @@ typedef enum
 typedef struct
 {
 	EventType type;
-	char* data[4];
+	void* data;
 } Event;
 
 typedef struct 
@@ -27,6 +27,15 @@ void eventBusAddEventListener(EventBus _this, EventType eventType, EventListener
 {
 	_this.eventListeners[eventType] = arrayAddElement(_this.eventListeners[eventType], &eventListener);
 }
+
+EventBus eventBusCleanEventListeners(EventBus _this)
+{
+	for(int i = 0; i < EVENT_TYPE_COUNT; i++)
+	{
+		arrayClear(_this.eventListeners[i]);
+	}
+}
+
 
 EventBus eventBusCreate(void)
 {

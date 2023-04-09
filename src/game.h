@@ -13,6 +13,7 @@ typedef enum
 	COMPONENT_TRANSFORM,
 	COMPONENT_CIRCULAR_MOVEMENT,
 	COMPONENT_ANIMATION,
+	COMPONENT_KEYBOARD_CONTROLLER,
 	COMPONENT_COUNT,
 } ComponentEnum;
 
@@ -118,7 +119,7 @@ Game gameCreate()
 		SDL_WINDOWPOS_CENTERED,
 		_this.windowWidth,
 		_this.windowHeight,
-		SDL_WINDOW_BORDERLESS);
+		0);
 
 	assert(_this.window != NULL && "Error creating SDL window");
 
@@ -256,6 +257,10 @@ void gameProcessInput(Game* _this)
 			_this->isRunning = false;
 			break;
 		case SDL_KEYDOWN:
+			Event evt = {.type = EVENT_TYPE_KEY_DOWN}; 
+			evt.data = &event.key.keysym.sym;
+
+			eventBusEmmitEvent(_this->eventBus, evt);
 			if (event.key.keysym.sym == SDLK_ESCAPE)
 			{
 				_this->isRunning = false;
@@ -290,16 +295,20 @@ void gameUpdate(Game* _this)
 	float deltaTime = (SDL_GetTicks() - _this->millisecondsPreviousFrame) / 1000.f;
 	_this->millisecondsPreviousFrame = SDL_GetTicks();
 
+	keyboardControllerSystemAddListener(_this->eventBus);
+
+	gameProcessInput(_this);
+
 	circularMovementSystem(_this->registry, deltaTime);
 	animationSystem(_this->registry);
 	registryUpdate(&_this->registry);
+	eventBusCleanEventListeners(_this->eventBus);
 }
 
 void gameRun(Game* _this)
 {
 	while (_this->isRunning)
 	{
-		gameProcessInput(_this);
 		gameUpdate(_this);
 		gameRender(*_this);
 	}

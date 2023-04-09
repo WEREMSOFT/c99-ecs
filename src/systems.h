@@ -70,9 +70,23 @@ void animationSystem(Registry registry)
 }
 
 // KEYBOARD CONTROLLER
-void keyboardControllerSystem()
+void keyboardHandler(Event event)
 {
-	
+	SDL_KeyCode keyCode = *(SDL_Keycode*)event.data;
+	switch(keyCode)
+	{
+		case SDLK_UP:
+			loggerLog("Key is UP!");
+			break;
+		case SDLK_DOWN:
+			loggerLog("KEY IS DOWN!");
+			break;
+	}
+}
+
+void keyboardControllerSystemAddListener(EventBus eventBus)
+{
+	eventBusAddEventListener(eventBus, EVENT_TYPE_KEY_DOWN, keyboardHandler);
 }
 
 #endif

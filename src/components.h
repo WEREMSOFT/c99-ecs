@@ -88,3 +88,9 @@ AnimationComponent animationComponentCreate(int numFrames, int frameRateSpeed, b
 
 	return returnValue;
 }
+
+// KEYBOARD COMPONENT
+typedef struct
+{
+} KeyboardComponent;
+
