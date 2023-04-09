@@ -69,4 +69,10 @@ void animationSystem(Registry registry)
 	}
 }
 
+// KEYBOARD CONTROLLER
+void keyboardControllerSystem()
+{
+	
+}
+
 #endif

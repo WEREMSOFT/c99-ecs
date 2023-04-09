@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include "assetStore.h"
+#include "eventBus.h"
 
 #define MAX_ENTITIES 600
 const int FPS = 60;
@@ -92,6 +93,7 @@ typedef struct
 	int millisecondsPreviousFrame;
 	bool isRunning;
 	AssetStore assetStore;
+	EventBus eventBus;
 } Game;
 
 Game gameCreate()
@@ -123,6 +125,8 @@ Game gameCreate()
  	_this.renderer = SDL_CreateRenderer(_this.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	assert(_this.renderer != NULL && "Error creating renderer");
+
+	_this.eventBus = eventBusCreate();
 
 	return _this;
 }
