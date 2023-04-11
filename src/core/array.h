@@ -5,8 +5,11 @@
 #include <stdlib.h>
 #include "logger.h"
 
-#define myMalloc malloc
-#define myFree free
+#ifndef myMalloc
+	#define myMalloc malloc
+	#define myFree free
+#endif
+
 // Array
 typedef struct
 {

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 #define GREEN "\033[32m"
 #define YELLOW "\033[33m"

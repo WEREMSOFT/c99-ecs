@@ -1,22 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "core/debugMemory.h"
 #include <string.h>
-
-#define __DEBUG_BUILD__
-
-#include "core/array.h"
-#include "core/bitset.h"
-#include "core/logger.h"
 
 #include <SDL2/SDL.h>
 #include "game.h"
-
-#include "core/logger.h"
-
-void eventListener(Event evt)
-{
-	loggerLog("Event recibed %d", evt.type);
-}
 
 int main()
 {

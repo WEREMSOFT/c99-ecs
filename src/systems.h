@@ -121,7 +121,7 @@ void keyboardControllerSystemAddListener(EventBus eventBus)
 // RIGID BODY
 void movementSystem(Registry registry, float deltaTime)
 {
-	ArrayHeader* entities = systemGetEntities(SYSTEM_ANIMATION, registry);
+	ArrayHeader* entities = systemGetEntities(SYSTEM_MOVEMENT, registry);
 	for(int i = 0; i < entities->size; i++)
 	{
 		int entityId = arrayGetElementAtI(entities, i);
