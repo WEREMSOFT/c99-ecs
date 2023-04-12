@@ -81,7 +81,10 @@ Registry registryCreate()
 	returnValue.components[COMPONENT_PROJECTILE_EMITTER] = arrayCreate(MAX_ENTITIES, sizeof(ProjectileEmitterComponent));
 
 	for(int i = 0; i < COMPONENT_COUNT; i ++)
+	{
 		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
+		memset(returnValue.entity2Component[i]->data, -1, returnValue.entity2Component[i]->capacity);
+	}
 
 	for(int i = 0; i < GROUP_COUNT; i++)
 		returnValue.groups[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
@@ -187,25 +190,25 @@ void gameInit(Game* _this)
 
 	float scale = 1.;
 	Vector2 scaleV = {scale, scale};
-	// tilemapCreate(&_this->registry, scaleV);
+	tilemapCreate(&_this->registry, scaleV);
 	
 	float phase = 0.;
-	// registryAddTree(&_this->registry, 1, 1, scaleV);
-	// registryAddEntity(&_this->registry, 2, 1, scaleV);
-	// registryAddEntity(&_this->registry, 3, 1, scaleV);
-	// registryAddEntity(&_this->registry, 4, 1, scaleV);
-	// registryAddEntity(&_this->registry, 5, 1, scaleV);
+	registryAddTree(&_this->registry, 1, 1, scaleV);
+	registryAddTree(&_this->registry, 2, 1, scaleV);
+	registryAddTree(&_this->registry, 3, 1, scaleV);
+	registryAddTree(&_this->registry, 4, 1, scaleV);
+	registryAddTree(&_this->registry, 5, 1, scaleV);
 
 	// ADD ANIMATED CHOPPER
 	registryAddBullet(&_this->registry, 100, 10, scaleV);
 	registryAddBullet(&_this->registry, 100, 10, scaleV);
 	registryAddBullet(&_this->registry, 100, 10, scaleV);
 	registryAddBullet(&_this->registry, 100, 10, scaleV);
-	registryAddBullet(&_this->registry, 5, 10, scaleV);
-	registryAddBullet(&_this->registry, 5, 10, scaleV);
-	registryAddBullet(&_this->registry, 5, 10, scaleV);
-	registryAddBullet(&_this->registry, 5, 10, scaleV);
 	helicopterCreate(&_this->registry, scaleV);
+	registryAddBullet(&_this->registry, 5, 10, scaleV);
+	registryAddBullet(&_this->registry, 5, 10, scaleV);
+	registryAddBullet(&_this->registry, 5, 10, scaleV);
+	registryAddBullet(&_this->registry, 5, 10, scaleV);
 }
 
 void gameDestroy(Game _this)

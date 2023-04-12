@@ -53,7 +53,7 @@ void arrayClear(ArrayHeader* _this)
 	_this->size = 0;
 
 	#ifdef __DEBUG_BUILD__
-		memset(&_this->data[0], 0, _this->capacity * _this->dataTypeSize);
+		memset(&_this->data[0], -1, _this->capacity * _this->dataTypeSize);
 	#endif
 }
 
@@ -135,6 +135,7 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 
 void* arrayGetElementAt(ArrayHeader* _this, int index)
 {
+	assert(_this->size > -1 && "arrayGetElementAt negative index");
 	assert(index < _this->size && "arrayGetElementAt index out of bounds");
 	return &_this->data[index * _this->dataTypeSize];
 }
@@ -186,7 +187,7 @@ void arrayDeleteElement(ArrayHeader *_this, int elementIndex)
 	*((Pivot *)&_this->data[elementIndex * _this->dataTypeSize]) = *lastElement;
 
 	#ifdef __DEBUG_BUILD__
-		memset(&_this->data[lastIndex * _this->dataTypeSize], 0, _this->dataTypeSize);
+		memset(&_this->data[lastIndex * _this->dataTypeSize], -1, _this->dataTypeSize);
 	#endif
 
 	_this->size--;

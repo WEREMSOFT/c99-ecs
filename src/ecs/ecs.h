@@ -25,6 +25,9 @@ typedef struct
 
 int registryCreateEntity(Registry* _this)
 {
+	for(int i = 0; i < COMPONENT_COUNT; i++)
+		_this->entity2Component[i] = arrayAddElementAt(_this->entity2Component[i], &(int){-1},_this->entityCount);
+	
 	return _this->entityCount++;
 }
 
@@ -142,8 +145,8 @@ void registryUpdate(Registry* registry)
 		{
 			return *elm2 - *elm1;
 		}
-
-		qsort(registry->entitiesToDelete->data, registry->entitiesToDelete->size, registry->entitiesToDelete->dataTypeSize, comp);
+		if(registry->entitiesToDelete->size > 0)
+			qsort(registry->entitiesToDelete->data, registry->entitiesToDelete->size, registry->entitiesToDelete->dataTypeSize, comp);
 	}
 
 	if(registry->entitiesToDelete->size > 1)
