@@ -28,6 +28,7 @@ typedef enum
 	COMPONENT_ANIMATION,
 	COMPONENT_RIGID_BODY,
 	COMPONENT_KEYBOARD_CONTROLLER,
+	COMPONENT_PROJECTILE_EMITTER,
 	COMPONENT_COUNT,
 } ComponentEnum;
 
@@ -36,7 +37,8 @@ typedef enum
 	SYSTEM_RENDER,
 	SYSTEM_CIRCULAR_MOVEMENT,
 	SYSTEM_ANIMATION,
-	SYSTEM_KEYBOARD_CONTROLLER,
+	SYSTEM_KEYBOARD,
+	SYSTEM_PROJECTILE_EMITTER,
 	SYSTEM_MOVEMENT,
 	SYSTEM_COUNT,
 } SystemEnum;
@@ -75,6 +77,7 @@ Registry registryCreate()
 	returnValue.components[COMPONENT_ANIMATION] = arrayCreate(MAX_ENTITIES, sizeof(AnimationComponent));
 	returnValue.components[COMPONENT_KEYBOARD_CONTROLLER] = arrayCreate(MAX_ENTITIES, sizeof(KeyboardComponent));
 	returnValue.components[COMPONENT_RIGID_BODY] = arrayCreate(MAX_ENTITIES, sizeof(RigidBodyComponent));
+	returnValue.components[COMPONENT_PROJECTILE_EMITTER] = arrayCreate(MAX_ENTITIES, sizeof(ProjectileEmitterComponent));
 
 	for(int i = 0; i < COMPONENT_COUNT; i ++)
 		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
@@ -97,14 +100,17 @@ Registry registryCreate()
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_RENDER], COMPONENT_SPRITE);
 
 	// BUILD SYSTEM_KEYBOARD_CONTROLLER SIGNATURE
-	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_KEYBOARD_CONTROLLER], COMPONENT_KEYBOARD_CONTROLLER);
-	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_KEYBOARD_CONTROLLER], COMPONENT_RIGID_BODY);
-	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_KEYBOARD_CONTROLLER], COMPONENT_TRANSFORM);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_KEYBOARD], COMPONENT_KEYBOARD_CONTROLLER);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_KEYBOARD], COMPONENT_RIGID_BODY);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_KEYBOARD], COMPONENT_TRANSFORM);
 
 	// BUILD MOVEMENT_SYSTEM SIGNATURE
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_RIGID_BODY);
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_MOVEMENT], COMPONENT_TRANSFORM);
 
+	// BUILD PROJECTILE_EMITTER SIGNATURE
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_PROJECTILE_EMITTER], COMPONENT_TRANSFORM);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_PROJECTILE_EMITTER], COMPONENT_PROJECTILE_EMITTER);
 	return returnValue;
 }
 
@@ -218,7 +224,7 @@ void gameProcessInput(Game* _this)
 			Event evt = {.type = EVENT_TYPE_KEY_DOWN}; 
 			KeyboardEventData data = {0};
 			data.keyCode = event.key.keysym.sym;
-			data.registry = _this->registry;
+			data.registry = &_this->registry;
 			evt.data = &data;
 
 			eventBusEmmitEvent(_this->eventBus, evt);
@@ -257,12 +263,13 @@ void gameUpdate(Game* _this)
 	_this->millisecondsPreviousFrame = SDL_GetTicks();
 
 	keyboardControllerSystemAddListener(_this->eventBus);
+	projectileEmitterSystemAddListener(_this->eventBus);
 
 	gameProcessInput(_this);
 
 	circularMovementSystem(_this->registry, deltaTime);
 	animationSystem(_this->registry);
-	movementSystem(_this->registry, deltaTime);
+	movementSystem(&_this->registry, deltaTime);
 	registryUpdate(&_this->registry);
 	eventBusCleanEventListeners(_this->eventBus);
 }

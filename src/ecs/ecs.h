@@ -39,7 +39,7 @@ bool entityHasComponent(int entityId, ComponentEnum componentId, Registry regist
 	return bitsetIsSet(componentSignature, componentId);
 }
 
-void registryDeleteEntity(int entityId, Registry* registry)
+void registryDeleteEntity(Registry* registry, int entityId)
 {
 	registry->isDirty = true;
 	// a. delete component at entityId

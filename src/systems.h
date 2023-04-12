@@ -72,20 +72,20 @@ void animationSystem(Registry registry)
 // KEYBOARD CONTROLLER
 typedef struct 
 {
-	Registry registry;
+	Registry* registry;
 	SDL_KeyCode keyCode;
 } KeyboardEventData;
 
 void keyboardHandler(Event event)
 {
 	KeyboardEventData data = *(KeyboardEventData*)event.data;
-	ArrayHeader* entities = systemGetEntities(SYSTEM_KEYBOARD_CONTROLLER, data.registry);
+	ArrayHeader* entities = systemGetEntities(SYSTEM_KEYBOARD, *data.registry);
 	for(int i = 0; i < entities->size; i++)
 	{
 		int entityId = arrayGetElementAtI(entities, i);
-		RigidBodyComponent* rigidBody = entityGetComponent(entityId, data.registry, COMPONENT_RIGID_BODY);
-		KeyboardComponent* keyboardComponent = entityGetComponent(entityId, data.registry, COMPONENT_KEYBOARD_CONTROLLER);
-		SpriteComponent* sprite = entityGetComponent(entityId, data.registry, COMPONENT_SPRITE);
+		RigidBodyComponent* rigidBody = entityGetComponent(entityId, *data.registry, COMPONENT_RIGID_BODY);
+		KeyboardComponent* keyboardComponent = entityGetComponent(entityId, *data.registry, COMPONENT_KEYBOARD_CONTROLLER);
+		SpriteComponent* sprite = entityGetComponent(entityId, *data.registry, COMPONENT_SPRITE);
 				
 		switch(data.keyCode)
 		{
@@ -118,19 +118,46 @@ void keyboardControllerSystemAddListener(EventBus eventBus)
 	eventBusAddEventListener(eventBus, EVENT_TYPE_KEY_DOWN, keyboardHandler);
 }
 
-// RIGID BODY
-void movementSystem(Registry registry, float deltaTime)
+// MOVEMENT SYSTEM
+void movementSystem(Registry* registry, float deltaTime)
 {
-	ArrayHeader* entities = systemGetEntities(SYSTEM_MOVEMENT, registry);
+	ArrayHeader* entities = systemGetEntities(SYSTEM_MOVEMENT, *registry);
 	for(int i = 0; i < entities->size; i++)
 	{
 		int entityId = arrayGetElementAtI(entities, i);
-		RigidBodyComponent* rigidBody = entityGetComponent(entityId, registry, COMPONENT_RIGID_BODY);
-		TransformComponent* transform = entityGetComponent(entityId, registry, COMPONENT_TRANSFORM);
+		TransformComponent* transform = entityGetComponent(entityId, *registry, COMPONENT_TRANSFORM);
+
+		if(transform->position.x > 200.)
+		{
+			registryDeleteEntity(registry, i);
+			continue;
+		} 
+
+		RigidBodyComponent* rigidBody = entityGetComponent(entityId, *registry, COMPONENT_RIGID_BODY);
 
 		transform->position.x += rigidBody->velocity.x * deltaTime;
 		transform->position.y += rigidBody->velocity.y * deltaTime;
 	}
+}
+
+// PROJECTILE EMMITER
+void projectileEmitterEventListener(Event event)
+{
+	KeyboardEventData data = *(KeyboardEventData*)event.data;
+	if(data.keyCode != SDLK_SPACE) return;
+	ArrayHeader* entities = systemGetEntities(SYSTEM_PROJECTILE_EMITTER, *data.registry);
+	for(int i = 0; i < entities->size; i++)
+	{
+		int entityId = arrayGetElementAtI(entities, i);
+		TransformComponent* transform = entityGetComponent(entityId, *data.registry, COMPONENT_TRANSFORM);
+
+		registryAddBullet(data.registry, transform->position.x, transform->position.y, (Vector2){1., 1.});
+	}
+}
+
+void projectileEmitterSystemAddListener(EventBus eventBus)
+{
+	eventBusAddEventListener(eventBus, EVENT_TYPE_KEY_DOWN, projectileEmitterEventListener);
 }
 
 #endif
