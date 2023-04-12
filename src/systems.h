@@ -129,7 +129,7 @@ void movementSystem(Registry* registry, float deltaTime)
 
 		if(transform->position.x > 200.)
 		{
-			registryDeleteEntity(registry, i);
+			entityQueueForDeletion(entityId, registry);
 			continue;
 		} 
 
@@ -151,6 +151,7 @@ void projectileEmitterEventListener(Event event)
 		int entityId = arrayGetElementAtI(entities, i);
 		TransformComponent* transform = entityGetComponent(entityId, *data.registry, COMPONENT_TRANSFORM);
 
+		registryAddBullet(data.registry, transform->position.x, transform->position.y, (Vector2){1., 1.});
 		registryAddBullet(data.registry, transform->position.x, transform->position.y, (Vector2){1., 1.});
 	}
 }

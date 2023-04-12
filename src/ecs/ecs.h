@@ -11,12 +11,14 @@
 typedef struct
 {
 	int entityCount;
+	int frameCount;
 	ArrayHeader* groups[GROUP_COUNT];
 	ArrayHeader* components[COMPONENT_COUNT];
 	ArrayHeader* entity2Component[COMPONENT_COUNT];
 	ArrayHeader* entitiesPerSystem[SYSTEM_COUNT];
 	ArrayHeader* componentSignatures;
 	ArrayHeader* tags;
+	ArrayHeader* entitiesToDelete;
 	Bitset systemInterestSignatures[SYSTEM_COUNT];
 	bool isDirty;
 } Registry;
@@ -133,7 +135,30 @@ void systemAddEntity(SystemEnum systemId, int entityId, Registry registry)
 
 void registryUpdate(Registry* registry)
 {
-	if(!registry->isDirty) return registry;
+	if(!registry->isDirty) return;
+	// SORT ENTITIES TO DELETE FROM HIGH TO LOW
+	{
+		int comp(const int* elm1, const int* elm2) 
+		{
+			return *elm2 - *elm1;
+		}
+
+		qsort(registry->entitiesToDelete->data, registry->entitiesToDelete->size, registry->entitiesToDelete->dataTypeSize, comp);
+	}
+
+	if(registry->entitiesToDelete->size > 1)
+	{
+		loggerWarn("entities: %d, frame: %d", registry->entitiesToDelete->size, registry->frameCount);
+	}
+
+	for(int i = 0; i < registry->entitiesToDelete->size; i++)
+	{
+		int entityId = arrayGetElementAtI(registry->entitiesToDelete, i);
+		registryDeleteEntity(registry, entityId);
+	}
+
+	arrayClear(registry->entitiesToDelete);
+
 	registryCleanSystemArrays(*registry);
 
 	for(int entityId = 0; entityId < registry->entityCount; entityId++)
@@ -153,5 +178,11 @@ Registry registryAddEntityToGroup(Registry _this, int entityId, int groupId)
 {
 	_this.groups[groupId] = arrayAddElement(_this.groups[groupId], entityId);
 	return _this;
+}
+
+void entityQueueForDeletion(int entityId, Registry* registry)
+{
+	registry->isDirty = true;
+	registry->entitiesToDelete = arrayAddElement(registry->entitiesToDelete, &entityId);
 }
 #endif

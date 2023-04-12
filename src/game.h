@@ -67,6 +67,7 @@ Registry registryCreate()
 
 	returnValue.isDirty = true;
 
+	returnValue.entitiesToDelete = arrayCreate(MAX_ENTITIES, sizeof(int));
 	returnValue.componentSignatures = arrayCreate(MAX_ENTITIES, sizeof(Bitset));
 	returnValue.tags = arrayCreateAndInitToZero(MAX_ENTITIES, sizeof(Bitset));
 	returnValue.tags->size = returnValue.tags->capacity;
@@ -189,14 +190,21 @@ void gameInit(Game* _this)
 	// tilemapCreate(&_this->registry, scaleV);
 	
 	float phase = 0.;
-	registryAddTree(&_this->registry, 1, 1, scaleV);
+	// registryAddTree(&_this->registry, 1, 1, scaleV);
 	// registryAddEntity(&_this->registry, 2, 1, scaleV);
 	// registryAddEntity(&_this->registry, 3, 1, scaleV);
 	// registryAddEntity(&_this->registry, 4, 1, scaleV);
 	// registryAddEntity(&_this->registry, 5, 1, scaleV);
 
 	// ADD ANIMATED CHOPPER
-	registryAddBullet(&_this->registry, 10, 10, scaleV);
+	registryAddBullet(&_this->registry, 100, 10, scaleV);
+	registryAddBullet(&_this->registry, 100, 10, scaleV);
+	registryAddBullet(&_this->registry, 100, 10, scaleV);
+	registryAddBullet(&_this->registry, 100, 10, scaleV);
+	registryAddBullet(&_this->registry, 5, 10, scaleV);
+	registryAddBullet(&_this->registry, 5, 10, scaleV);
+	registryAddBullet(&_this->registry, 5, 10, scaleV);
+	registryAddBullet(&_this->registry, 5, 10, scaleV);
 	helicopterCreate(&_this->registry, scaleV);
 }
 
@@ -258,6 +266,7 @@ static void delayFrameBasedOnElapsedTime(Game _this)
 void gameUpdate(Game* _this)
 {
 	delayFrameBasedOnElapsedTime(*_this);
+	_this->registry.frameCount++;
 
 	float deltaTime = (SDL_GetTicks() - _this->millisecondsPreviousFrame) / 1000.f;
 	_this->millisecondsPreviousFrame = SDL_GetTicks();
