@@ -119,7 +119,7 @@ void keyboardControllerSystemAddListener(EventBus eventBus)
 }
 
 // MOVEMENT SYSTEM
-void movementSystem(Registry* registry, float deltaTime)
+void movementSystem(Registry* registry, float deltaTime, Vector2 screenSize)
 {
 	ArrayHeader* entities = systemGetEntities(SYSTEM_MOVEMENT, *registry);
 	for(int i = 0; i < entities->size; i++)
@@ -127,7 +127,7 @@ void movementSystem(Registry* registry, float deltaTime)
 		int entityId = arrayGetElementAtI(entities, i);
 		TransformComponent* transform = entityGetComponent(entityId, *registry, COMPONENT_TRANSFORM);
 
-		if(transform->position.x > 200.)
+		if(transform->position.x <0 || transform->position.x > screenSize.x || transform->position.y < 0 || transform->position.y > screenSize.y)
 		{
 			entityQueueForDeletion(entityId, registry);
 			continue;

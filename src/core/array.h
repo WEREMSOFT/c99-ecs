@@ -154,23 +154,23 @@ float arrayGetElementAtf(ArrayHeader* _this, int index)
 	return *element;
 }
 
-void* arrayGetElementOrCreateAt(ArrayHeader* _this, int index)
+void* arrayGetElementOrCreateAt(ArrayHeader** _this, int index)
 {
 	typedef struct 
 	{
-		char array[_this->dataTypeSize];
+		char array[(*_this)->dataTypeSize];
 	} Pivot;
 		
 	Pivot pivot;
 
-	memset(pivot.array, 0, _this->dataTypeSize);
+	memset(pivot.array, 0, (*_this)->dataTypeSize);
 
-	if(index >= _this->size)
+	if(index >= (*_this)->size)
 	{
-		_this = arrayAddElementAt(_this, &pivot, index);
+		(*_this) = arrayAddElementAt(*_this, &pivot, index);
 	}
 
-	return arrayGetElementAt(_this, index);
+	return arrayGetElementAt((*_this), index);
 }
 
 void arrayDeleteElement(ArrayHeader *_this, int elementIndex)

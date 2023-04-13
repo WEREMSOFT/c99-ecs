@@ -104,7 +104,7 @@ void* entityAddComponent(int entityId, Registry* registry, void* component, Comp
 	// Register component as part of the entity
 	int componentIndex = registry->components[componentId]->size - 1;
 	registry->entity2Component[componentId] = arrayAddElementAt(registry->entity2Component[componentId], &componentIndex, entityId);
-	Bitset* signature = arrayGetElementOrCreateAt(registry->componentSignatures, entityId);
+	Bitset* signature = arrayGetElementOrCreateAt(&registry->componentSignatures, entityId);
 	bitsetSet(signature, componentId);
 	// The size of the component map must be at least as big as the entities array.
 	return entityGetComponent(entityId, *registry, componentId);
@@ -131,9 +131,9 @@ void registryCleanSystemArrays(Registry registry)
 	}
 }
 
-void systemAddEntity(SystemEnum systemId, int entityId, Registry registry)
+void systemAddEntity(SystemEnum systemId, int entityId, Registry* registry)
 {
-	 registry.entitiesPerSystem[systemId] = arrayAddElement(registry.entitiesPerSystem[systemId], &entityId);
+	 registry->entitiesPerSystem[systemId] = arrayAddElement(registry->entitiesPerSystem[systemId], &entityId);
 }
 
 void registryUpdate(Registry* registry)
@@ -170,7 +170,7 @@ void registryUpdate(Registry* registry)
 		{
 			if(systemIsInterestedInEntity(systemId, entityId, *registry))
 			{
-				systemAddEntity(systemId, entityId, *registry);
+				systemAddEntity(systemId, entityId, registry);
 			}
 		}
 	}

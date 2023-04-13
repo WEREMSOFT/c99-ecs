@@ -6,8 +6,8 @@
 #define __STATIC_ALLOC_IMPLEMENTATION__
 #include "core/stackAllocator/staticAlloc.h"
 
-#define myMalloc allocStatic
-#define myFree freeStatic
+#define myMalloc malloc
+#define myFree free
 
 #include "core/array.h"
 #include "core/bitset.h"
@@ -281,7 +281,7 @@ void gameUpdate(Game* _this)
 
 	circularMovementSystem(_this->registry, deltaTime);
 	animationSystem(_this->registry);
-	movementSystem(&_this->registry, deltaTime);
+	movementSystem(&_this->registry, deltaTime, (Vector2){_this->windowWidth, _this->windowHeight});
 	registryUpdate(&_this->registry);
 	eventBusCleanEventListeners(_this->eventBus);
 }
