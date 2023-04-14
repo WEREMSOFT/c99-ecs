@@ -6,6 +6,9 @@
 #define __STATIC_ALLOC_IMPLEMENTATION__
 #include "core/stackAllocator/staticAlloc.h"
 
+// #define myMalloc allocStatic
+// #define myFree freeStatic
+
 #define myMalloc malloc
 #define myFree free
 
@@ -135,7 +138,7 @@ typedef struct
 
 Game gameCreate()
 {
-	staticAllocatorInit(1000000);
+	staticAllocatorInit(60000000);
 	Game _this = {0};
 	_this.windowWidth = 800;
 	_this.windowHeight = 600;
@@ -200,15 +203,7 @@ void gameInit(Game* _this)
 	registryAddTree(&_this->registry, 5, 1, scaleV);
 
 	// ADD ANIMATED CHOPPER
-	registryAddBullet(&_this->registry, 100, 10, scaleV);
-	registryAddBullet(&_this->registry, 100, 10, scaleV);
-	registryAddBullet(&_this->registry, 100, 10, scaleV);
-	registryAddBullet(&_this->registry, 100, 10, scaleV);
 	helicopterCreate(&_this->registry, scaleV);
-	registryAddBullet(&_this->registry, 5, 10, scaleV);
-	registryAddBullet(&_this->registry, 5, 10, scaleV);
-	registryAddBullet(&_this->registry, 5, 10, scaleV);
-	registryAddBullet(&_this->registry, 5, 10, scaleV);
 }
 
 void gameDestroy(Game _this)

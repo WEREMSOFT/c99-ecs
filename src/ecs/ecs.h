@@ -89,10 +89,10 @@ void entityAddTag(int entityId, Registry registry, int tag)
 	bitsetSet(returnValue, tag);
 }
 
-bool entityHasTag(int entityId, Registry registry, int tag)
+bool entityHasTag(int entityId, Registry *registry, int tag)
 {
 	Bitset entityTags = 0;
-	entityTags = *(Bitset *)arrayGetElementAt(registry.tags, entityId);
+	entityTags = *(Bitset *)arrayGetElementOrCreateAt(&registry->tags, entityId);
 	return bitsetIsSet(entityTags, tag);
 }
 
@@ -147,11 +147,6 @@ void registryUpdate(Registry* registry)
 		}
 		if(registry->entitiesToDelete->size > 0)
 			qsort(registry->entitiesToDelete->data, registry->entitiesToDelete->size, registry->entitiesToDelete->dataTypeSize, comp);
-	}
-
-	if(registry->entitiesToDelete->size > 1)
-	{
-		loggerWarn("entities: %d, frame: %d", registry->entitiesToDelete->size, registry->frameCount);
 	}
 
 	for(int i = 0; i < registry->entitiesToDelete->size; i++)

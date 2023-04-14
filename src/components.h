@@ -24,7 +24,7 @@ typedef struct
 // RIGIDBODY
 typedef struct 
 {
-	Vector velocity;
+	Vector2 velocity;
 } RigidBodyComponent;
 
 // CIRCULAR MOVEMENT

@@ -15,7 +15,7 @@ void registryAddTree(Registry* _this, int x, int y, Vector2 scaleV)
 	entityAddComponent(entityId, _this, &cmc, COMPONENT_CIRCULAR_MOVEMENT);
 }
 // BULLET
-void registryAddBullet(Registry* _this, int x, int y, Vector2 scaleV) 
+void registryAddBullet(Registry* _this, int x, int y, Vector2 scaleV, Vector2 velocity) 
 {
 	int entityId = registryCreateEntity(_this);
 	
@@ -26,7 +26,7 @@ void registryAddBullet(Registry* _this, int x, int y, Vector2 scaleV)
 	entityAddComponent(entityId, _this, &transformComponent, COMPONENT_TRANSFORM);
 
 	RigidBodyComponent rigidBodyComponent = {0};
-	rigidBodyComponent.velocity.x = 100.;
+	rigidBodyComponent.velocity = velocity;
 	entityAddComponent(entityId, _this, &rigidBodyComponent, COMPONENT_RIGID_BODY);
 }
 
@@ -38,6 +38,8 @@ void helicopterCreate(Registry* registry, Vector2 scaleV)
 	entityAddComponent(entityId, registry, &spriteComponent, COMPONENT_SPRITE);
 	TransformComponent transformComponent = {{100, 100}, scaleV, 0};
 	entityAddComponent(entityId, registry, &transformComponent, COMPONENT_TRANSFORM);
+
+	entityAddTag(entityId, *registry, TAG_PLAYER);
 
 	KeyboardComponent keyboardComponent = {.velocity = 80.};
 	entityAddComponent(entityId, registry, &keyboardComponent, COMPONENT_KEYBOARD_CONTROLLER);

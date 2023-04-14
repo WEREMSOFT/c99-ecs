@@ -124,8 +124,17 @@ void movementSystem(Registry* registry, float deltaTime, Vector2 screenSize)
 	ArrayHeader* entities = systemGetEntities(SYSTEM_MOVEMENT, *registry);
 	for(int i = 0; i < entities->size; i++)
 	{
+
 		int entityId = arrayGetElementAtI(entities, i);
 		TransformComponent* transform = entityGetComponent(entityId, *registry, COMPONENT_TRANSFORM);
+
+		if(entityId < 600 && entityHasTag(entityId, registry, TAG_PLAYER))
+		{
+			registryAddBullet(registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, (Vector2){0, 80.});
+			registryAddBullet(registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, (Vector2){0, -80});
+			registryAddBullet(registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, (Vector2){80, 0});
+			registryAddBullet(registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, (Vector2){-80, 0});
+		}
 
 		if(transform->position.x <0 || transform->position.x > screenSize.x || transform->position.y < 0 || transform->position.y > screenSize.y)
 		{
@@ -146,13 +155,14 @@ void projectileEmitterEventListener(Event event)
 	KeyboardEventData data = *(KeyboardEventData*)event.data;
 	if(data.keyCode != SDLK_SPACE) return;
 	ArrayHeader* entities = systemGetEntities(SYSTEM_PROJECTILE_EMITTER, *data.registry);
+
 	for(int i = 0; i < entities->size; i++)
 	{
 		int entityId = arrayGetElementAtI(entities, i);
 		TransformComponent* transform = entityGetComponent(entityId, *data.registry, COMPONENT_TRANSFORM);
+		RigidBodyComponent* rigidBody = entityGetComponent(entityId, *data.registry, COMPONENT_RIGID_BODY);
 
-		registryAddBullet(data.registry, transform->position.x, transform->position.y, (Vector2){1., 1.});
-		registryAddBullet(data.registry, transform->position.x, transform->position.y, (Vector2){1., 1.});
+		registryAddBullet(data.registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, rigidBody->velocity);
 	}
 }
 

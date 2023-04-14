@@ -3,9 +3,14 @@
 
 	#include <stdlib.h>
 	#include "logger.h"
+
+	static int totalAllocatedMemory = 0;
+
 	void* debug_malloc(size_t size, char *file, int line)
 	{
+		totalAllocatedMemory += size;
 		loggerLog("allocating %d bytes at %s:%d", size, file, line);
+		loggerLog("Total allocated memory %d", totalAllocatedMemory);
 		return malloc(size);
 	}
 

@@ -79,7 +79,7 @@ ArrayHeader* arrayAddElement(ArrayHeader* _this, const void* element)
 
 	Pivot* pivot = (Pivot *)&_this->data[_this->size * _this->dataTypeSize];
 
-	*pivot = *((Pivot*)element);
+   	*pivot = *((Pivot*)element);
 
 	_this->size += 1;
 	return _this;
