@@ -6,10 +6,6 @@
 #define __STATIC_ALLOC_IMPLEMENTATION__
 #include "core/stackAllocator/staticAlloc.h"
 
-#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
-#include "cimgui.h"
-#include "cimgui_impl.h"
-
 // #define myMalloc allocStatic
 // #define myFree freeStatic
 
@@ -173,37 +169,6 @@ Game gameCreate()
 
 	_this.eventBus = eventBusCreate();
 
-
- 	const char* glsl_version = "#version 130";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-
-	// setup imgui
-	igCreateContext(NULL);
-
-  	SDL_GLContext gl_context = SDL_GL_CreateContext(_this.window);
-
-	//set docking
-	ImGuiIO* ioptr = igGetIO();
-	ioptr->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-	//ioptr->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	#ifdef IMGUI_HAS_DOCK
-	ioptr->ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	ioptr->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-	#endif
-	
-	ImGui_ImplSDL2_InitForOpenGL(_this.window, gl_context);
-	ImGui_ImplOpenGL3_Init(glsl_version);
-
-	igStyleColorsDark(NULL);
-	//ImFontAtlas_AddFontDefault(io.Fonts, NULL);
-
-
-	bool showDemoWindow = true;
-	bool showAnotherWindow = false;
-
 	return _this;
 }
 
@@ -219,6 +184,8 @@ void gameLoadAssets(Game *_this)
 	CREATE_TEXTURE_ASSET(TEXTURE_LANDING_BASE, "./assets/images/landing-base.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_CHOPPER, "./assets/images/chopper-spritesheet.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_BULLET, "./assets/images/bullet.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_INFERNO_FLOOR_1, "./assets/Floor_Lower_1.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_INFERNO_FLOOR_2, "./assets/Floor_Lower_2.png");
 	#undef CREATE_TEXTURE_ASSET
 }
 
@@ -228,7 +195,7 @@ void gameInit(Game* _this)
 
 	float scale = 1.;
 	Vector2 scaleV = {scale, scale};
-	tilemapCreate(&_this->registry, scaleV);
+	tilemapCreateInferno(&_this->registry, scaleV);
 	
 	float phase = 0.;
 	registryAddTree(&_this->registry, 1, 1, scaleV);
