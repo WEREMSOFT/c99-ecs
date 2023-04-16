@@ -10,6 +10,9 @@
 #include "cimgui.h"
 #include "cimgui_impl.h"
 
+#include <GL/gl.h>
+#include <GL/glu.h>
+
 // #define myMalloc allocStatic
 // #define myFree freeStatic
 
@@ -138,7 +141,40 @@ typedef struct
 	bool isRunning;
 	AssetStore assetStore;
 	EventBus eventBus;
+	SDL_GLContext gl_context;
+	ImGuiIO* ioptr;
 } Game;
+
+void setupDearImGui(Game* _this)
+{
+ 	const char* glsl_version = "#version 130";
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+	// setup imgui
+	igCreateContext(NULL);
+
+  	_this->gl_context = SDL_GL_CreateContext(_this->window);
+
+	{
+
+		//set docking
+		_this->ioptr = igGetIO();
+		_this->ioptr->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+		//ioptr->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		#ifdef IMGUI_HAS_DOCK
+			_this->ioptr->ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+			_this->ioptr->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+		#endif
+		
+		ImGui_ImplSDL2_InitForOpenGL(_this->window, _this->gl_context);
+		ImGui_ImplOpenGL3_Init(glsl_version);
+
+		igStyleColorsDark(NULL);
+	}
+}
 
 Game gameCreate()
 {
@@ -167,42 +203,15 @@ Game gameCreate()
 
 	assert(_this.window != NULL && "Error creating SDL window");
 
+ 	_this.gl_context = SDL_GL_CreateContext(_this.window);
+
  	_this.renderer = SDL_CreateRenderer(_this.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	assert(_this.renderer != NULL && "Error creating renderer");
 
 	_this.eventBus = eventBusCreate();
 
-
- 	const char* glsl_version = "#version 130";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-
-	// setup imgui
-	igCreateContext(NULL);
-
-  	SDL_GLContext gl_context = SDL_GL_CreateContext(_this.window);
-
-	//set docking
-	ImGuiIO* ioptr = igGetIO();
-	ioptr->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-	//ioptr->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	#ifdef IMGUI_HAS_DOCK
-	ioptr->ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	ioptr->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-	#endif
-	
-	ImGui_ImplSDL2_InitForOpenGL(_this.window, gl_context);
-	ImGui_ImplOpenGL3_Init(glsl_version);
-
-	igStyleColorsDark(NULL);
-	//ImFontAtlas_AddFontDefault(io.Fonts, NULL);
-
-
-	bool showDemoWindow = true;
-	bool showAnotherWindow = false;
+	setupDearImGui(&_this);
 
 	return _this;
 }
@@ -255,6 +264,7 @@ void gameProcessInput(Game* _this)
 
 	while (SDL_PollEvent(&event))
 	{
+		ImGui_ImplSDL2_ProcessEvent(&event);
 		// Handle SDL events
 		switch (event.type)
 		{
@@ -278,6 +288,64 @@ void gameProcessInput(Game* _this)
 	}
 }
 
+void renderDearImGui(Game _this)
+{
+	ImVec4 clearColor;
+	clearColor.x = 1.00f;
+	clearColor.y = 0.55f;
+	clearColor.z = 0.60f;
+	clearColor.w = 1.00f;
+	// start imgui frame
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	igNewFrame();
+	bool showDemoWindow = true;
+	igShowDemoWindow(&showDemoWindow);
+
+	{
+		static float f = 0.0f;
+		static int counter = 0;
+
+		igBegin("Hello, world!", NULL, 0);
+		igText("This is some useful text");
+		igCheckbox("Demo window", &showDemoWindow);
+
+		igSliderFloat("Float", &f, 0.0f, 1.0f, "%.3f", 0);
+		igColorEdit3("clear color", (float*)&clearColor, 0);
+
+		ImVec2 buttonSize;
+		buttonSize.x = 0;
+		buttonSize.y = 0;
+		if (igButton("Button", buttonSize))
+			counter++;
+		igSameLine(0.0f, -1.0f);
+		igText("counter = %d", counter);
+
+		igText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / igGetIO()->Framerate, igGetIO()->Framerate);
+		igEnd();
+	}
+
+	igRender();
+	SDL_GL_MakeCurrent(_this.window, _this.gl_context);
+	glViewport(0, 0, (int)_this.ioptr->DisplaySize.x, (int)_this.ioptr->DisplaySize.y);
+	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+	glClear(GL_COLOR_BUFFER_BIT);
+	ImDrawData *dd = igGetDrawData();
+	ImGui_ImplOpenGL3_RenderDrawData(dd);
+
+	#ifdef IMGUI_HAS_DOCK
+		if (_this.ioptr->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+				SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+				igUpdatePlatformWindows();
+				igRenderPlatformWindowsDefault(NULL,NULL);
+				SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+			}
+	#endif
+	SDL_GL_SwapWindow(_this.window);
+}
+
 void gameRender(Game _this)
 {
 	SDL_SetRenderDrawColor(_this.renderer, 21, 21, 21, 255);
@@ -285,7 +353,9 @@ void gameRender(Game _this)
 
 	renderSystem(_this.registry, _this.assetStore, _this.renderer);
 
+
 	SDL_RenderPresent(_this.renderer);
+	renderDearImGui(_this);
 }
 
 static void delayFrameBasedOnElapsedTime(Game _this)
