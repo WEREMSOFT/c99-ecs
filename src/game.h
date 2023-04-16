@@ -186,6 +186,7 @@ void gameLoadAssets(Game *_this)
 	CREATE_TEXTURE_ASSET(TEXTURE_BULLET, "./assets/images/bullet.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_INFERNO_FLOOR_1, "./assets/Floor_Lower_1.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_INFERNO_FLOOR_2, "./assets/Floor_Lower_2.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_INFERNO_COLUMN, "./assets/Column_5.png");
 	#undef CREATE_TEXTURE_ASSET
 }
 

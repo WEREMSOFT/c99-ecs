@@ -54,6 +54,7 @@ void tilemapCreate(Registry* registry, Vector2 scaleV)
 
 void tilemapCreateInferno(Registry* registry, Vector2 scaleV)
 {
+	float scale = 1.;
 	int cols = 10, rows = 10;
 	int tilemap[rows][cols];
 
@@ -66,27 +67,30 @@ void tilemapCreateInferno(Registry* registry, Vector2 scaleV)
 			int entityId = registryCreateEntity(registry);
 			entityAddTag(entityId, *registry, TAG_TILE);
 
-			float xf = (y + x) * -32 + 400;
-			float yf = (x - y) * 32 + 200;
+			float xf = (y - x) * -32 + cols * 30;
+			float yf = (x + y) * 32 + rows;
 			SDL_Rect srcRect = (SDL_Rect){0, 0, 64, 64};
 			SDL_Rect destRect = (SDL_Rect){ xf, yf, 64, 64 };
 			
-			TextureIdEnum asset = TEXTURE_INFERNO_FLOOR_2;
+			TextureIdEnum asset = TEXTURE_INFERNO_COLUMN;
 
 			switch(tilemap[y][x])
 			{
 				case 21:
 					asset = TEXTURE_INFERNO_FLOOR_1;
 					break;
-				case 16:
-					asset = TEXTURE_INFERNO_FLOOR_2;
+				case 20:
+					asset = TEXTURE_INFERNO_COLUMN;
+					srcRect.h = 128;
+					destRect.y -= 64;
+					destRect.h = 128;
 					break;
 			}
 
-			SpriteComponent spriteComponent = spriteComponentCreate(asset, 64, 64, 0, srcRect.x, srcRect.y, scaleV.x);
+			SpriteComponent spriteComponent = spriteComponentCreate(asset, srcRect.w, srcRect.h, 0, srcRect.x, scale, scale);
 			entityAddComponent(entityId, registry, &spriteComponent, COMPONENT_SPRITE);
 
-			Vector2 position = {destRect.x * scaleV.x, destRect.y * scaleV.y};
+			Vector2 position = {destRect.x * scale, destRect.y * scale};
 
 			TransformComponent transformComponent = {position, scaleV, 0};
 			entityAddComponent(entityId, registry, &transformComponent, COMPONENT_TRANSFORM);

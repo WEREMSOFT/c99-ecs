@@ -128,14 +128,6 @@ void movementSystem(Registry* registry, float deltaTime, Vector2 screenSize)
 		int entityId = arrayGetElementAtI(entities, i);
 		TransformComponent* transform = entityGetComponent(entityId, *registry, COMPONENT_TRANSFORM);
 
-		if(entityId < 600 && entityHasTag(entityId, registry, TAG_PLAYER))
-		{
-			registryAddBullet(registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, (Vector2){0, 80.});
-			registryAddBullet(registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, (Vector2){0, -80});
-			registryAddBullet(registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, (Vector2){80, 0});
-			registryAddBullet(registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, (Vector2){-80, 0});
-		}
-
 		if(transform->position.x <0 || transform->position.x > screenSize.x || transform->position.y < 0 || transform->position.y > screenSize.y)
 		{
 			entityQueueForDeletion(entityId, registry);
@@ -162,7 +154,11 @@ void projectileEmitterEventListener(Event event)
 		TransformComponent* transform = entityGetComponent(entityId, *data.registry, COMPONENT_TRANSFORM);
 		RigidBodyComponent* rigidBody = entityGetComponent(entityId, *data.registry, COMPONENT_RIGID_BODY);
 
-		registryAddBullet(data.registry, transform->position.x, transform->position.y, (Vector2){1., 1.}, rigidBody->velocity);
+		Vector2 newVelocity = rigidBody->velocity;
+		newVelocity.x *= 5.;
+		newVelocity.y *= 5.;
+
+		registryAddBullet(data.registry, transform->position.x + 16, transform->position.y + 16, (Vector2){1., 1.}, newVelocity);
 	}
 }
 
