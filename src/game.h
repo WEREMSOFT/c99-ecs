@@ -11,8 +11,8 @@
 #define __STATIC_ALLOC_IMPLEMENTATION__
 #include "core/stackAllocator/staticAlloc.h"
 
-// #define myMalloc allocStatic
-// #define myFree freeStatic
+#define myMalloc allocStatic
+#define myFree freeStatic
 
 #define myMalloc malloc
 #define myFree free
@@ -211,6 +211,7 @@ void gameLoadAssets(Game *_this)
 	CREATE_TEXTURE_ASSET(TEXTURE_INFERNO_FLOOR_1, "./assets/Floor_Lower_1.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_INFERNO_FLOOR_2, "./assets/Floor_Lower_2.png");
 	CREATE_TEXTURE_ASSET(TEXTURE_INFERNO_COLUMN, "./assets/Column_5.png");
+	CREATE_TEXTURE_ASSET(TEXTURE_INFERNO_TILE_MAP, "./assets/tilemaps/floorISO.png");
 	#undef CREATE_TEXTURE_ASSET
 }
 

@@ -38,7 +38,7 @@ void tilemapCreate(Registry* registry, Vector2 scaleV)
 			int entityId = registryCreateEntity(registry);
 			entityAddTag(entityId, *registry, TAG_TILE);
 
-			SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};;
+			SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};
 			SDL_Rect destRect = (SDL_Rect){ x * 32, y * 32, 32, 32 };
 			
 			SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_TILE_MAP, 32, 32, 0, srcRect.x, srcRect.y, scaleV.x);
@@ -69,25 +69,12 @@ void tilemapCreateInferno(Registry* registry, Vector2 scaleV)
 
 			float xf = (y - x) * -32 + cols * 30;
 			float yf = (x + y) * 32 + rows;
-			SDL_Rect srcRect = (SDL_Rect){0, 0, 64, 64};
+			// SDL_Rect srcRect = (SDL_Rect){0, 0, 64, 64};
+			int tileNumber = tilemap[y][x];
+			SDL_Rect srcRect = (SDL_Rect){ (tileNumber % 3) * 64, (tileNumber / 3) * 64, 64, 64};
 			SDL_Rect destRect = (SDL_Rect){ xf, yf, 64, 64 };
-			
-			TextureIdEnum asset = TEXTURE_INFERNO_COLUMN;
-
-			switch(tilemap[y][x])
-			{
-				case 21:
-					asset = TEXTURE_INFERNO_FLOOR_1;
-					break;
-				case 20:
-					asset = TEXTURE_INFERNO_COLUMN;
-					srcRect.h = 128;
-					destRect.y -= 64;
-					destRect.h = 128;
-					break;
-			}
-
-			SpriteComponent spriteComponent = spriteComponentCreate(asset, srcRect.w, srcRect.h, 0, srcRect.x, scale, scale);
+	
+			SpriteComponent spriteComponent = spriteComponentCreate(TEXTURE_INFERNO_TILE_MAP, srcRect.w, srcRect.h, 0, srcRect.x, srcRect.y, false);
 			entityAddComponent(entityId, registry, &spriteComponent, COMPONENT_SPRITE);
 
 			Vector2 position = {destRect.x * scale, destRect.y * scale};
