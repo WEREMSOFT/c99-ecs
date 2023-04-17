@@ -2,7 +2,7 @@ SRC_F := $(shell find src -name *.c) $(shell find libs -name *.c)
 OBJ_FOR_CLEAN_F := $(shell find ./src -name *.o)
 SRC_O := $(patsubst %.c,%.o,$(SRC_F))
 
-LIBS := -lSDL2 -llua5.3 -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lm
+LIBS := -lSDL2 -llua5.3 -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lm -lcimgui_sdl -lGL
 
 FLAGS_DEBUG := -g -O0 -w
 FLAGS__DEBUG := -O3

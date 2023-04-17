@@ -1,6 +1,11 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include <cimgui.h>
+#define CIMGUI_USE_SDL2
+#include <cimgui_impl.h>
+
 #define __DEBUG_BUILD__
 
 #define __STATIC_ALLOC_IMPLEMENTATION__
@@ -134,7 +139,24 @@ typedef struct
 	bool isRunning;
 	AssetStore assetStore;
 	EventBus eventBus;
+	ImGuiIO* io;
 } Game;
+
+void setupDearImgui(Game* _this)
+{
+    igCreateContext(NULL);
+    _this->io = igGetIO();
+	_this->io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+	#ifdef IMGUI_HAS_DOCK
+	ioptr->ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	ioptr->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+	#endif
+
+	ImGui_ImplSDL2_InitForSDLRenderer(_this->window, _this->renderer);
+    ImGui_ImplSDLRenderer_Init(_this->renderer);
+  	
+  	igStyleColorsDark(NULL);
+}
 
 Game gameCreate()
 {
@@ -168,6 +190,8 @@ Game gameCreate()
 	assert(_this.renderer != NULL && "Error creating renderer");
 
 	_this.eventBus = eventBusCreate();
+
+	setupDearImgui(&_this);
 
 	return _this;
 }
@@ -224,6 +248,7 @@ void gameProcessInput(Game* _this)
 	while (SDL_PollEvent(&event))
 	{
 		// Handle SDL events
+		ImGui_ImplSDL2_ProcessEvent(&event);
 		switch (event.type)
 		{
 		case SDL_QUIT:
@@ -253,6 +278,14 @@ void gameRender(Game _this)
 
 	renderSystem(_this.registry, _this.assetStore, _this.renderer);
 
+ 	ImGui_ImplSDLRenderer_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    igNewFrame();
+	igShowDemoWindow(&(bool){true});
+	igRender();
+	ImDrawData* dd = igGetDrawData();
+	ImGui_ImplSDLRenderer_RenderDrawData(dd);
+	
 	SDL_RenderPresent(_this.renderer);
 }
 
