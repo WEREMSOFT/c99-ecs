@@ -11,8 +11,8 @@
 #define __STATIC_ALLOC_IMPLEMENTATION__
 #include "core/stackAllocator/staticAlloc.h"
 
-#define myMalloc allocStatic
-#define myFree freeStatic
+// #define myMalloc allocStatic
+// #define myFree freeStatic
 
 #define myMalloc malloc
 #define myFree free
@@ -272,6 +272,24 @@ void gameProcessInput(Game* _this)
 	}
 }
 
+void showGUI(Game _this)
+{
+	ImGui_ImplSDLRenderer_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    igNewFrame();
+	// igShowDemoWindow(&(bool){true});
+
+	igBegin("Debug", &(bool){true}, 0);
+	igText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _this.io->Framerate, _this.io->Framerate);
+	igText("Entities %d", _this.registry.entityCount);
+	igText("Get Memory Usage %d", totalAllocatedMemory);
+	igEnd();
+
+	igRender();
+	ImDrawData* dd = igGetDrawData();
+	ImGui_ImplSDLRenderer_RenderDrawData(dd);
+}
+
 void gameRender(Game _this)
 {
 	SDL_SetRenderDrawColor(_this.renderer, 21, 21, 21, 255);
@@ -279,13 +297,7 @@ void gameRender(Game _this)
 
 	renderSystem(_this.registry, _this.assetStore, _this.renderer);
 
- 	ImGui_ImplSDLRenderer_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    igNewFrame();
-	igShowDemoWindow(&(bool){true});
-	igRender();
-	ImDrawData* dd = igGetDrawData();
-	ImGui_ImplSDLRenderer_RenderDrawData(dd);
+ 	showGUI(_this);
 	
 	SDL_RenderPresent(_this.renderer);
 }

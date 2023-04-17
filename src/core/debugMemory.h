@@ -1,5 +1,5 @@
 #ifndef __DEBUG_MEMORY__
-	#define __DEBUG_MEMORY__
+#define __DEBUG_MEMORY__
 
 	#include <stdlib.h>
 	#include "logger.h"

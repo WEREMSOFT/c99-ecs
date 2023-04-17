@@ -43,4 +43,9 @@ void staticAllocatorDestroy()
     free(stackAllocator);
 }
 
+int getMemoryUsage()
+{
+	return stackAllocator->header.length;
+}
+
 #endif
