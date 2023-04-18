@@ -8,12 +8,6 @@
 
 #define __DEBUG_BUILD__
 
-#define __STATIC_ALLOC_IMPLEMENTATION__
-#include "core/stackAllocator/staticAlloc.h"
-
-// #define myMalloc allocStatic
-// #define myFree freeStatic
-
 #define myMalloc malloc
 #define myFree free
 
@@ -160,7 +154,6 @@ void setupDearImgui(Game* _this)
 
 Game gameCreate()
 {
-	staticAllocatorInit(60000000);
 	Game _this = {0};
 	_this.windowWidth = 800;
 	_this.windowHeight = 600;
@@ -239,7 +232,6 @@ void gameDestroy(Game _this)
 	SDL_DestroyRenderer(_this.renderer);
 	SDL_DestroyWindow(_this.window);
 	SDL_Quit();
-	staticAllocatorDestroy();
 }
 
 void gameProcessInput(Game* _this)
