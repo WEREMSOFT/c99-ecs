@@ -31,8 +31,6 @@
 
 	void debug_free(void* p, char *file, int line)
 	{
-		loggerLog("deallocating %s:%d", file, line);
-
 		int location = -1;
 		for(int i = 0; i<meminfoCount; i++)
 		{
@@ -44,8 +42,10 @@
 		}
 
 		assert(location > -1 && "pointer not found, possible double free?");
-		memoryInformations[location] = memoryInformations[meminfoCount-1];
+		loggerLog("deallocating %d bytes - %s:%d", memoryInformations[location].size, file, line);
 
+		memoryInformations[location] = memoryInformations[meminfoCount-1];
+		meminfoCount--;
 		free(p);
 	}
 

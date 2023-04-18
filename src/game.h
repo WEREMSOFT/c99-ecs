@@ -235,7 +235,6 @@ void gameDestroy(Game _this)
 	arrayDestroy(_this.registry.tags);
 	arrayDestroy(_this.registry.componentSignatures);
 	arrayDestroy(_this.registry.entitiesToDelete);
-	arrayDestroy(_this.registry.entity2Component);
 
 	for(int i = 0; i < GROUP_COUNT; i++)
 	{
