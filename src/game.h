@@ -232,6 +232,26 @@ void gameDestroy(Game _this)
 	SDL_DestroyRenderer(_this.renderer);
 	SDL_DestroyWindow(_this.window);
 	SDL_Quit();
+	arrayDestroy(_this.registry.tags);
+	arrayDestroy(_this.registry.componentSignatures);
+	arrayDestroy(_this.registry.entitiesToDelete);
+	arrayDestroy(_this.registry.entity2Component);
+
+	for(int i = 0; i < GROUP_COUNT; i++)
+	{
+		arrayDestroy(_this.registry.groups[i]);
+	}
+
+	for(int i = 0; i < COMPONENT_COUNT; i++)
+	{
+		arrayDestroy(_this.registry.components[i]);
+		arrayDestroy(_this.registry.entity2Component[i]);
+	}
+
+	for(int i = 0; i < SYSTEM_COUNT; i++)
+	{
+		arrayDestroy(_this.registry.entitiesPerSystem[i]);
+	}
 }
 
 void gameProcessInput(Game* _this)
@@ -274,7 +294,7 @@ void showGUI(Game _this)
 	igBegin("Debug", &(bool){true}, 0);
 	igText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _this.io->Framerate, _this.io->Framerate);
 	igText("Entities %d", _this.registry.entityCount);
-	igText("Get Memory Usage %d", totalAllocatedMemory);
+	// igText("Get Memory Usage %d", totalAllocatedMemory);
 	igEnd();
 
 	igRender();

@@ -21,20 +21,21 @@ typedef struct
 
 ArrayHeader* arrayCreate(int capacity, int dataTypeSize)
 {
-	void* returnValue = myMalloc(sizeof(ArrayHeader) + capacity * dataTypeSize);
-	ArrayHeader* header = (ArrayHeader*)returnValue;
+	assert(capacity > 0 && "Capacity can not be 0 (or less)");
+	ArrayHeader* header = myMalloc(sizeof(ArrayHeader) + capacity * dataTypeSize);
 	header->capacity = capacity;
 	header->size = 0;
 	header->dataTypeSize = dataTypeSize;
-	return returnValue;
+	return header;
 }
 
 ArrayHeader* arrayCreateAndInitToZero(int capacity, int dataTypeSize)
 {
+	assert(capacity > 0 && "Capacity can not be 0 (or less)");
 	size_t size = sizeof(ArrayHeader) + capacity * dataTypeSize;
 	ArrayHeader* returnValue = myMalloc(size);
 
-	memset(returnValue->data, 0, capacity * dataTypeSize);
+	memset(returnValue->data, 0xBE, capacity * dataTypeSize);
 	
 	ArrayHeader* header = (ArrayHeader*)returnValue;
 	header->capacity = capacity;
@@ -104,7 +105,7 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 	if(index >= _this->capacity)
 	{
 		ArrayHeader* biggerArray = arrayCreateAndInitToZero(index + 1, _this->dataTypeSize);
-		memcpy(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
+		memmove(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
 		arrayDestroy(_this);
 		_this = biggerArray;
 		_this->size = index;
