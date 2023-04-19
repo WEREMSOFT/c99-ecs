@@ -4,7 +4,7 @@ SRC_O := $(patsubst %.c,%.o,$(SRC_F))
 
 LIBS := -lSDL2 -llua5.3 -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lm -lcimgui_sdl -lGL -lstdc++
 
-FLAGS_DEBUG := -g -O0 -w
+FLAGS_DEBUG := -g -O0 -w -fsanitize=address
 FLAGS__DEBUG := -O3
 FLAGS := -Wall -Wextra -Ilibs/include -Llibs
 

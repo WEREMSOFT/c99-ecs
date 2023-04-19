@@ -103,10 +103,10 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 {
 	if(index >= _this->capacity)
 	{
-
 		size_t newCapacity = index * 2;
 		size_t fullNewSize = sizeof(ArrayHeader) + newCapacity * _this->dataTypeSize;
 		_this = myRealloc(_this, fullNewSize);
+		assert(_this != NULL && "realloc error");
 		_this->capacity = newCapacity;
 		_this->size = index;
 	}
@@ -137,7 +137,7 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 void* arrayGetElementAt(ArrayHeader* _this, int index)
 {
 	assert(index > -1 && "arrayGetElementAt negative index");
-	assert(index < _this->size && "arrayGetElementAt index out of bounds");
+	assert(index <= _this->size && "arrayGetElementAt index out of bounds");
 	return &_this->data[index * _this->dataTypeSize];
 }
 
@@ -157,19 +157,15 @@ float arrayGetElementAtf(ArrayHeader* _this, int index)
 
 void* arrayGetElementOrCreateAt(ArrayHeader** _this, int index)
 {
-	typedef struct 
+	if(index > (*_this)->size)
 	{
-		char array[(*_this)->dataTypeSize];
-	} Pivot;
-		
-	Pivot pivot;
-
-	memset(pivot.array, 0, (*_this)->dataTypeSize);
-
-	if(index >= (*_this)->size)
-	{
+		void* pivot = malloc((*_this)->dataTypeSize);
+		memset(pivot, 0, (*_this)->dataTypeSize);
 		(*_this) = arrayAddElementAt(*_this, &pivot, index);
+		free(pivot);
 	}
+
+
 
 	return arrayGetElementAt((*_this), index);
 }

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "core/debugMemory.h"
+// #include "core/debugMemory.h"
 #include <string.h>
 #include <locale.h>
 
@@ -20,7 +20,7 @@ int main()
 	// {
 	// 	value = arrayGetElementOrCreateAt(&array, i);
 	// 	array = arrayAddElementAt(array, &(ArrayHeader){.capacity = i * 19, .size = i, .dataTypeSize = 0xBEEF}, i);
-	// 	loggerLog("valor es %zu # %zu", value->size, value->capacity);
+	// 	// loggerLog("valor es %zu # %zu", value->size, value->capacity);
 	// }
 	
 	// arrayDestroy(array);

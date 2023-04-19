@@ -20,7 +20,7 @@
 #include "assetStore.h"
 #include "eventBus.h"
 
-#define MAX_ENTITIES 10
+#define MAX_ENTITIES 1
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
 
