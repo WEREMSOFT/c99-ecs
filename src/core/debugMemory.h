@@ -70,7 +70,7 @@
 		}
 
 		assert(location > -1 && "pointer not found, possible double free?");
-		loggerLog("deallocating %d bytes - %s:%d", memoryInformations[location].size, file, line);
+		loggerLog("deallocating %zu bytes - %s:%d", memoryInformations[location].size, file, line);
 
 		memoryInformations[location] = memoryInformations[meminfoCount-1];
 		meminfoCount--;

@@ -109,11 +109,6 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 		_this = myRealloc(_this, fullNewSize);
 		_this->capacity = newCapacity;
 		_this->size = index;
-
-		// ArrayHeader* biggerArray = arrayCreateAndInitToZero(index + 1, _this->dataTypeSize);
-		// memmove(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
-		// arrayDestroy(_this);
-		// _this = biggerArray;
 	}
 
 	typedef struct 
