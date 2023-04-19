@@ -13,13 +13,13 @@
 // Array
 typedef struct
 {
-	int size;
-	int capacity;
-	int dataTypeSize;
+	size_t size;
+	size_t capacity;
+	size_t dataTypeSize;
 	char data[1];
 } ArrayHeader;
 
-ArrayHeader* arrayCreate(int capacity, int dataTypeSize)
+ArrayHeader* arrayCreate(size_t capacity, size_t dataTypeSize)
 {
 	assert(capacity > 0 && "Capacity can not be 0 (or less)");
 	ArrayHeader* header = myMalloc(sizeof(ArrayHeader) + capacity * dataTypeSize);
@@ -29,7 +29,7 @@ ArrayHeader* arrayCreate(int capacity, int dataTypeSize)
 	return header;
 }
 
-ArrayHeader* arrayCreateAndInitToZero(int capacity, int dataTypeSize)
+ArrayHeader* arrayCreateAndInitToZero(size_t capacity, size_t dataTypeSize)
 {
 	assert(capacity > 0 && "Capacity can not be 0 (or less)");
 	size_t size = sizeof(ArrayHeader) + capacity * dataTypeSize;
@@ -54,7 +54,7 @@ void arrayClear(ArrayHeader* _this)
 	_this->size = 0;
 
 	#ifdef __DEBUG_BUILD__
-		memset(&_this->data[0], -1, _this->capacity * _this->dataTypeSize);
+		memset(&_this->data[0], 0xBE, _this->capacity * _this->dataTypeSize);
 	#endif
 }
 
@@ -65,11 +65,10 @@ ArrayHeader* arrayAddElement(ArrayHeader* _this, const void* element)
 	#endif
 	if(_this->size == _this->capacity)
 	{
-		ArrayHeader* biggerArray = arrayCreate(_this->capacity * 2, _this->dataTypeSize);
-		memcpy(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
-		biggerArray->size = _this->size;
-		arrayDestroy(_this);
-		_this = biggerArray;
+		size_t newCapacity = _this->capacity * 2;
+		size_t fullNewSize = sizeof(ArrayHeader) + newCapacity * _this->dataTypeSize;
+		_this = myRealloc(_this, fullNewSize);
+		_this->capacity = newCapacity;
 	}
 
 	typedef struct 
@@ -104,11 +103,17 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 {
 	if(index >= _this->capacity)
 	{
-		ArrayHeader* biggerArray = arrayCreateAndInitToZero(index + 1, _this->dataTypeSize);
-		memmove(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
-		arrayDestroy(_this);
-		_this = biggerArray;
+
+		size_t newCapacity = index * 2;
+		size_t fullNewSize = sizeof(ArrayHeader) + newCapacity * _this->dataTypeSize;
+		_this = myRealloc(_this, fullNewSize);
+		_this->capacity = newCapacity;
 		_this->size = index;
+
+		// ArrayHeader* biggerArray = arrayCreateAndInitToZero(index + 1, _this->dataTypeSize);
+		// memmove(biggerArray->data, _this->data, _this->capacity * _this->dataTypeSize);
+		// arrayDestroy(_this);
+		// _this = biggerArray;
 	}
 
 	typedef struct 
@@ -136,7 +141,7 @@ ArrayHeader* arrayAddElementAt(ArrayHeader* _this, const void* element, int inde
 
 void* arrayGetElementAt(ArrayHeader* _this, int index)
 {
-	assert(_this->size > -1 && "arrayGetElementAt negative index");
+	assert(index > -1 && "arrayGetElementAt negative index");
 	assert(index < _this->size && "arrayGetElementAt index out of bounds");
 	return &_this->data[index * _this->dataTypeSize];
 }

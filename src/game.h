@@ -10,6 +10,8 @@
 
 #define myMalloc malloc
 #define myFree free
+#define myRealloc realloc
+#define myCalloc calloc
 
 #include "core/array.h"
 #include "core/bitset.h"
@@ -18,7 +20,7 @@
 #include "assetStore.h"
 #include "eventBus.h"
 
-#define MAX_ENTITIES 600
+#define MAX_ENTITIES 10
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
 

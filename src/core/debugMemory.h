@@ -8,21 +8,49 @@
 	typedef struct 
 	{
 		void* pointer;
-		int size;
+		size_t size;
 	} MemInfo;
 	static int meminfoCount = 0;
 	static MemInfo memoryInformations[100];
 
 	static int totalAllocatedMemory = 0;
 
+	void* debug_realloc(void *p, size_t size, char *file, int line)
+	{
+		totalAllocatedMemory += size;
+		loggerLog("reallocating %d bytes at %s:%d", size, file, line);
+		loggerLog("Total allocated memory %zu", totalAllocatedMemory);
+		MemInfo memInfo = {0};
+		memInfo.pointer = realloc(p, size);
+		memInfo.size = size;
+
+		memoryInformations[meminfoCount++] = memInfo;
+
+		return memInfo.pointer;
+	}
+
 	void* debug_malloc(size_t size, char *file, int line)
 	{
 		totalAllocatedMemory += size;
 		loggerLog("allocating %d bytes at %s:%d", size, file, line);
-		loggerLog("Total allocated memory %d", totalAllocatedMemory);
+		loggerLog("Total allocated memory %zu", totalAllocatedMemory);
 		MemInfo memInfo = {0};
 		memInfo.pointer = malloc(size);
 		memInfo.size = size;
+
+		memoryInformations[meminfoCount++] = memInfo;
+
+		return memInfo.pointer;
+	}
+
+	void* debug_calloc(size_t nmemb, size_t size, char *file, int line)
+	{
+		totalAllocatedMemory += size;
+		loggerLog("allocating %d bytes at %s:%d", size, file, line);
+		loggerLog("Total allocated memory %zu", totalAllocatedMemory);
+		MemInfo memInfo = {0};
+		memInfo.pointer = calloc(nmemb, size);
+		memInfo.size = nmemb * size;
 
 		memoryInformations[meminfoCount++] = memInfo;
 
@@ -60,6 +88,7 @@
 	}
 
 	#define malloc(x) debug_malloc((x), __FILE__, __LINE__)
+	#define realloc(x, y) debug_realloc((x), (y), __FILE__, __LINE__)
 	#define free(x) debug_free((x), __FILE__, __LINE__)
-	#define calloc(x, y) debug_malloc((x) * (y), __FILE__, __LINE__)
+	#define calloc(x, y) debug_calloc((x),  (y), __FILE__, __LINE__)
 #endif
