@@ -11,7 +11,7 @@
 		size_t size;
 	} MemInfo;
 	static int meminfoCount = 0;
-	static MemInfo memoryInformations[100];
+	static MemInfo memoryInformations[500];
 
 	static int totalAllocatedMemory = 0;
 
@@ -20,6 +20,7 @@
 		totalAllocatedMemory += size;
 		loggerLog("reallocating %d bytes at %s:%d", size, file, line);
 		loggerLog("Total allocated memory %zu", totalAllocatedMemory);
+		loggerLog("meminfo count %d", meminfoCount);
 		MemInfo memInfo = {0};
 		memInfo.pointer = realloc(p, size);
 		memInfo.size = size;

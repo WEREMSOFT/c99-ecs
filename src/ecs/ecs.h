@@ -83,9 +83,9 @@ void* entityGetComponent(int entityId, Registry registry, ComponentEnum componen
 	return arrayGetElementAt(registry.components[componentId], id);
 }
 
-void entityAddTag(int entityId, Registry registry, int tag)
+void entityAddTag(int entityId, Registry *registry, int tag)
 {
-	Bitset *returnValue = arrayGetElementOrCreateAt(&registry.tags, entityId);
+	Bitset *returnValue = arrayGetElementOrCreateAt(&registry->tags, entityId);
 	bitsetSet(returnValue, tag);
 }
 

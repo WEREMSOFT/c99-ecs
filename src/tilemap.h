@@ -36,7 +36,7 @@ void tilemapCreate(Registry* registry, Vector2 scaleV)
 		for(int x = 0; x < cols; x++)
 		{
 			int entityId = registryCreateEntity(registry);
-			entityAddTag(entityId, *registry, TAG_TILE);
+			entityAddTag(entityId, registry, TAG_TILE);
 
 			SDL_Rect srcRect = (SDL_Rect){(tilemap[y][x] % 10) * 32, (tilemap[y][x] / 10) * 32, 32, 32};
 			SDL_Rect destRect = (SDL_Rect){ x * 32, y * 32, 32, 32 };
@@ -65,7 +65,7 @@ void tilemapCreateInferno(Registry* registry, Vector2 scaleV)
 		for(int x = 0; x < cols; x++)
 		{
 			int entityId = registryCreateEntity(registry);
-			entityAddTag(entityId, *registry, TAG_TILE);
+			entityAddTag(entityId, registry, TAG_TILE);
 
 			float xf = (y - x) * -32 + cols * 30;
 			float yf = (x + y) * 32 + rows;

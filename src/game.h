@@ -295,7 +295,7 @@ void showGUI(Game _this)
 	igBegin("Debug", &(bool){true}, 0);
 	igText("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _this.io->Framerate, _this.io->Framerate);
 	igText("Entities %d", _this.registry.entityCount);
-	// igText("Get Memory Usage %d", totalAllocatedMemory);
+	igText("Get Memory Usage %d", totalAllocatedMemory);
 	igEnd();
 
 	igRender();
