@@ -2,17 +2,6 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-typedef struct
-{
-	float x,y,z,w;
-} Vector;
-
-typedef struct
-{
-	float x,y;
-} Vector2;
-
-
 // POSITION
 typedef struct 
 {

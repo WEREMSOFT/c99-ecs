@@ -1,5 +1,14 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
+#ifndef min
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
 
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include <cimgui.h>
@@ -45,6 +54,7 @@ typedef enum
 	SYSTEM_KEYBOARD,
 	SYSTEM_PROJECTILE_EMITTER,
 	SYSTEM_MOVEMENT,
+	SYSTEM_CAMERA_FOLLOW,
 	SYSTEM_COUNT,
 } SystemEnum;
 
@@ -63,9 +73,47 @@ enum GroupsEnum
 	GROUP_COUNT
 };
 
+typedef struct
+{
+	float x,y,z,w;
+} Vector;
+
+typedef struct
+{
+	float x,y;
+} Vector2;
+
 #include "ecs/ecs.h"
+
+typedef struct 
+{
+	int chopperId;
+} DebugInfo;
+
+typedef struct
+{
+	Registry registry;
+	SDL_Window *window;
+	SDL_Renderer *renderer;
+	Vector2 windowSize;
+	Vector2 mapSize;
+	int windowWidth;
+	int windowHeight;
+	int millisecondsPreviousFrame;
+	bool isRunning;
+	AssetStore assetStore;
+	EventBus eventBus;
+	ImGuiIO* io;
+	SDL_Rect camera;
+	float deltaTime;
+	#ifdef __DEBUG_BUILD__
+	DebugInfo debugInfo;
+	#endif
+} Game;
+
 #include "components.h"
 #include "entitiesCreators.h"
+
 Registry registryCreate()
 {
 	Registry returnValue = {0};
@@ -123,25 +171,11 @@ Registry registryCreate()
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_PROJECTILE_EMITTER], COMPONENT_PROJECTILE_EMITTER);
 
 	// BUILD CAMERA_FOLLOW SIGNATURE
-	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_PROJECTILE_EMITTER], COMPONENT_CAMERA_FOLLOW);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_CAMERA_FOLLOW], COMPONENT_CAMERA_FOLLOW);
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_CAMERA_FOLLOW], COMPONENT_TRANSFORM);
 	return returnValue;
 }
-
 #include "systems.h"
-typedef struct
-{
-	Registry registry;
-	SDL_Window *window;
-	SDL_Renderer *renderer;
-	Vector windowSize;
-	int windowWidth;
-	int windowHeight;
-	int millisecondsPreviousFrame;
-	bool isRunning;
-	AssetStore assetStore;
-	EventBus eventBus;
-	ImGuiIO* io;
-} Game;
 
 void setupDearImgui(Game* _this)
 {
@@ -221,7 +255,7 @@ void gameInit(Game* _this)
 
 	float scale = 1.;
 	Vector2 scaleV = {scale, scale};
-	tilemapCreateInferno(&_this->registry, scaleV);
+	tilemapCreateInferno(_this, scaleV);
 	
 	// float phase = 0.;
 	// registryAddTree(&_this->registry, 1, 1, scaleV);
@@ -232,6 +266,7 @@ void gameInit(Game* _this)
 
 	// ADD ANIMATED CHOPPER
 	helicopterCreate(&_this->registry, scaleV);
+	_this->debugInfo.chopperId = _this->registry.entityCount - 1;
 }
 
 void gameDestroy(Game _this)
@@ -290,7 +325,7 @@ void gameProcessInput(Game* _this)
 	}
 }
 
-void showGUI(Game _this)
+void renderGUI(Game _this)
 {
 	ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
@@ -303,6 +338,13 @@ void showGUI(Game _this)
 	#ifdef __DEBUG_MEMORY__
 		igText("Get Memory Usage %d", totalAllocatedMemory);
 	#endif
+	
+	TransformComponent *transform = entityGetComponent(_this.debugInfo.chopperId, _this.registry, COMPONENT_TRANSFORM);
+
+	igText("deltaTime: %f", _this.deltaTime);
+	igText("Tilemap size: %f - %f", _this.mapSize.x, _this.mapSize.y);
+	igText("chopper location: %f - %f", transform->position.x, transform->position.y);
+
 	igEnd();
 
 	igRender();
@@ -315,9 +357,9 @@ void gameRender(Game _this)
 	SDL_SetRenderDrawColor(_this.renderer, 21, 21, 21, 255);
 	SDL_RenderClear(_this.renderer);
 
-	renderSystem(_this.registry, _this.assetStore, _this.renderer);
+	renderSystem(_this.registry, _this.assetStore, _this.renderer, _this.camera);
 
- 	showGUI(_this);
+ 	renderGUI(_this);
 	
 	SDL_RenderPresent(_this.renderer);
 }
@@ -335,17 +377,18 @@ void gameUpdate(Game* _this)
 	delayFrameBasedOnElapsedTime(*_this);
 	_this->registry.frameCount++;
 
-	float deltaTime = (SDL_GetTicks() - _this->millisecondsPreviousFrame) / 1000.f;
+	_this->deltaTime = min((SDL_GetTicks() - _this->millisecondsPreviousFrame) / 1000.f, 0.016);
 	_this->millisecondsPreviousFrame = SDL_GetTicks();
 
 	keyboardControllerSystemAddListener(_this->eventBus);
 	projectileEmitterSystemAddListener(_this->eventBus);
 
 	gameProcessInput(_this);
+	cameraFollowSystem(_this);
 
-	circularMovementSystem(_this->registry, deltaTime);
+	circularMovementSystem(_this->registry, _this->deltaTime);
 	animationSystem(_this->registry);
-	movementSystem(&_this->registry, deltaTime, (Vector2){_this->windowWidth, _this->windowHeight});
+	movementSystem(&_this->registry, _this->deltaTime, (Vector2){_this->windowWidth, _this->windowHeight});
 	registryUpdate(&_this->registry);
 	eventBusCleanEventListeners(_this->eventBus);
 }

@@ -30,6 +30,18 @@ void registryAddBullet(Registry* _this, int x, int y, Vector2 scaleV, Vector2 ve
 	RigidBodyComponent rigidBodyComponent = {0};
 	rigidBodyComponent.velocity = velocity;
 	entityAddComponent(entityId, _this, &rigidBodyComponent, COMPONENT_RIGID_BODY);
+
+	Bitset bs = registryGetEntitySignature(*_this, entityId);
+	Bitset bsH = registryGetEntitySignature(*_this, 101);
+	Bitset ss = _this->systemInterestSignatures[SYSTEM_CAMERA_FOLLOW];
+	if(systemIsInterestedInEntity(SYSTEM_CAMERA_FOLLOW, entityId, *_this))
+	{
+		loggerLog("camera follow is interested in bullet!!!");
+	}
+	if(systemIsInterestedInEntity(SYSTEM_CAMERA_FOLLOW, 101, *_this))
+	{
+		loggerLog("camera follow is interested in hellicopter!!!");
+	}
 }
 
 //HELICOPTER

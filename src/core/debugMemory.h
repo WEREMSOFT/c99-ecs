@@ -7,7 +7,7 @@
 
 	#define MAX_INFO_COUNT 500
 
-	#define SHOW_MEM_DEBUG_INFO
+	// #define SHOW_MEM_DEBUG_INFO
 
 	typedef struct 
 	{

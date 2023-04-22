@@ -120,7 +120,8 @@ bool systemIsInterestedInEntity(SystemEnum systemId, int entityId, Registry regi
 {
 	Bitset entitySignature = registryGetEntitySignature(registry, entityId);
 	Bitset systemInterestSignature = registry.systemInterestSignatures[systemId];
-	return (entitySignature & systemInterestSignature) == systemInterestSignature;
+	bool returnValue = (entitySignature & systemInterestSignature) == systemInterestSignature;
+	return returnValue;
 }
 
 void registryCleanSystemArrays(Registry registry)

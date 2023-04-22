@@ -20,7 +20,7 @@ void circularMovementSystem(Registry registry, float deltaTime)
 	}
 }
 
-void renderSystem(Registry registry, AssetStore assetStore, SDL_Renderer* renderer)
+void renderSystem(Registry registry, AssetStore assetStore, SDL_Renderer* renderer, SDL_Rect camera)
 {
 	ArrayHeader* entities = systemGetEntities(SYSTEM_RENDER, registry);
 	// Sort entities by zindex
@@ -45,8 +45,8 @@ void renderSystem(Registry registry, AssetStore assetStore, SDL_Renderer* render
 		SDL_Texture *texture = assetStoreGetTexture(assetStore, sprite->assetId);
 
 		SDL_Rect destRect = {
-				transform->position.x,
-				transform->position.y,
+				transform->position.x - camera.x,
+				transform->position.y - camera.y,
 				sprite->width * transform->scale.x,
 				sprite->height * transform->scale.y};
 
@@ -128,11 +128,11 @@ void movementSystem(Registry* registry, float deltaTime, Vector2 screenSize)
 		int entityId = arrayGetElementAtI(entities, i);
 		TransformComponent* transform = entityGetComponent(entityId, *registry, COMPONENT_TRANSFORM);
 
-		if(transform->position.x <0 || transform->position.x > screenSize.x || transform->position.y < 0 || transform->position.y > screenSize.y)
-		{
-			entityQueueForDeletion(entityId, registry);
-			continue;
-		} 
+		// if(transform->position.x <0 || transform->position.x > screenSize.x || transform->position.y < 0 || transform->position.y > screenSize.y)
+		// {
+		// 	entityQueueForDeletion(entityId, registry);
+		// 	continue;
+		// } 
 
 		RigidBodyComponent* rigidBody = entityGetComponent(entityId, *registry, COMPONENT_RIGID_BODY);
 
@@ -167,4 +167,31 @@ void projectileEmitterSystemAddListener(EventBus eventBus)
 	eventBusAddEventListener(eventBus, EVENT_TYPE_KEY_DOWN, projectileEmitterEventListener);
 }
 
+// CAMERA FOLLOW
+void cameraFollowSystem(Game* game)
+{
+	ArrayHeader* entities = systemGetEntities(SYSTEM_CAMERA_FOLLOW, game->registry);
+	for(int i = 0; i < entities->size; i++)
+	{
+
+		int entityId = arrayGetElementAtI(entities, i);
+		TransformComponent transform = *(TransformComponent *)entityGetComponent(entityId, game->registry, COMPONENT_TRANSFORM);
+
+		if (transform.position.x + game->camera.w / 2 < game->mapSize.x)
+		{
+			game->camera.x = transform.position.x - game->windowWidth / 2;
+		}
+
+		if (transform.position.y + game->camera.h / 2 < game->mapSize.y)
+		{
+			game->camera.y = transform.position.y - game->windowHeight / 2;
+		}
+
+		game->camera.x = game->camera.x < 0 ? 0 : game->camera.x;
+		game->camera.y = game->camera.y < 0 ? 0 : game->camera.y;
+
+		game->camera.x = (game->camera.x + game->camera.w > game->mapSize.x) ? game->mapSize.x - game->camera.w : game->camera.x;
+		game->camera.y = (game->camera.y + game->camera.h > game->mapSize.y) ? game->mapSize.y - game->camera.h : game->camera.y;
+	}
+}
 #endif
