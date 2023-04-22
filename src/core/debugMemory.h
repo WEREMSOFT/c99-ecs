@@ -19,6 +19,24 @@
 
 	static int totalAllocatedMemory = 0;
 
+	int getMemoryInfoIndexFromPointer(void* p)
+	{
+		for(int i = 0; i<meminfoCount; i++)
+		{
+			if(memoryInformations[i].pointer == p)
+			{
+				return i;
+			}
+		}
+		assert("memory location not found, possible double free?");
+	}
+
+	MemInfo getMemoryInfoFromPointer(void* p)
+	{
+		int index = getMemoryInfoIndexFromPointer(p);
+		return memoryInformations[index];
+	}
+
 	void* debug_realloc(void *p, size_t size, char *file, int line)
 	{
 		totalAllocatedMemory += size;
@@ -31,7 +49,9 @@
 		memInfo.pointer = realloc(p, size);
 		memInfo.size = size;
 
-		memoryInformations[meminfoCount++] = memInfo;
+		int location = getMemoryInfoIndexFromPointer(p);
+
+		memoryInformations[location] = memInfo;
 
 		return memInfo.pointer;
 	}
@@ -74,15 +94,7 @@
 
 	void debug_free(void* p, char *file, int line)
 	{
-		int location = -1;
-		for(int i = 0; i<meminfoCount; i++)
-		{
-			if(memoryInformations[i].pointer == p)
-			{
-				location = i;
-				break;
-			}
-		}
+		int location = getMemoryInfoIndexFromPointer(p);
 
 		assert(location > -1 && "pointer not found, possible double free?");
 		#ifdef SHOW_MEM_DEBUG_INFO

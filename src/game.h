@@ -33,6 +33,7 @@ typedef enum
 	COMPONENT_RIGID_BODY,
 	COMPONENT_KEYBOARD_CONTROLLER,
 	COMPONENT_PROJECTILE_EMITTER,
+	COMPONENT_CAMERA_FOLLOW,
 	COMPONENT_COUNT,
 } ComponentEnum;
 
@@ -83,8 +84,9 @@ Registry registryCreate()
 	returnValue.components[COMPONENT_KEYBOARD_CONTROLLER] = arrayCreate(MAX_ENTITIES, sizeof(KeyboardComponent));
 	returnValue.components[COMPONENT_RIGID_BODY] = arrayCreate(MAX_ENTITIES, sizeof(RigidBodyComponent));
 	returnValue.components[COMPONENT_PROJECTILE_EMITTER] = arrayCreate(MAX_ENTITIES, sizeof(ProjectileEmitterComponent));
+	returnValue.components[COMPONENT_CAMERA_FOLLOW] = arrayCreate(MAX_ENTITIES, sizeof(CameraFollowComponent));
 
-	for(int i = 0; i < COMPONENT_COUNT; i ++)
+	for(int i = 0; i < COMPONENT_COUNT; i++)
 	{
 		returnValue.entity2Component[i] = arrayCreate(MAX_ENTITIES, sizeof(int));
 		memset(returnValue.entity2Component[i]->data, -1, returnValue.entity2Component[i]->capacity);
@@ -119,6 +121,9 @@ Registry registryCreate()
 	// BUILD PROJECTILE_EMITTER SIGNATURE
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_PROJECTILE_EMITTER], COMPONENT_TRANSFORM);
 	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_PROJECTILE_EMITTER], COMPONENT_PROJECTILE_EMITTER);
+
+	// BUILD CAMERA_FOLLOW SIGNATURE
+	bitsetSet(&returnValue.systemInterestSignatures[SYSTEM_PROJECTILE_EMITTER], COMPONENT_CAMERA_FOLLOW);
 	return returnValue;
 }
 
@@ -218,12 +223,12 @@ void gameInit(Game* _this)
 	Vector2 scaleV = {scale, scale};
 	tilemapCreateInferno(&_this->registry, scaleV);
 	
-	float phase = 0.;
-	registryAddTree(&_this->registry, 1, 1, scaleV);
-	registryAddTree(&_this->registry, 2, 1, scaleV);
-	registryAddTree(&_this->registry, 3, 1, scaleV);
-	registryAddTree(&_this->registry, 4, 1, scaleV);
-	registryAddTree(&_this->registry, 5, 1, scaleV);
+	// float phase = 0.;
+	// registryAddTree(&_this->registry, 1, 1, scaleV);
+	// registryAddTree(&_this->registry, 2, 1, scaleV);
+	// registryAddTree(&_this->registry, 3, 1, scaleV);
+	// registryAddTree(&_this->registry, 4, 1, scaleV);
+	// registryAddTree(&_this->registry, 5, 1, scaleV);
 
 	// ADD ANIMATED CHOPPER
 	helicopterCreate(&_this->registry, scaleV);

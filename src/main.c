@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-// #include "core/debugMemory.h"
+#include "core/debugMemory.h"
 #include <string.h>
 #include <locale.h>
 
@@ -18,5 +18,4 @@ int main()
 	gameRun(&game);
 
 	gameDestroy(game);
-	
 }

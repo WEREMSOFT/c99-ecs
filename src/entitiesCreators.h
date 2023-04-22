@@ -54,6 +54,9 @@ void helicopterCreate(Registry* registry, Vector2 scaleV)
 
 	ProjectileEmitterComponent projectileComponent = projectileEmitterCreate((Vector2){100., 0}, 20., 10., 10., true);
 	entityAddComponent(entityId, registry, &projectileComponent, COMPONENT_PROJECTILE_EMITTER);
+
+	CameraFollowComponent cameraFollowComponent = {0};
+	entityAddComponent(entityId, registry, &cameraFollowComponent, COMPONENT_CAMERA_FOLLOW);
 }
 
 #endif

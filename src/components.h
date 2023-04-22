@@ -125,3 +125,8 @@ ProjectileEmitterComponent projectileEmitterCreate(
 	_this.lastEmissionTimeMs = SDL_GetTicks();
 	return _this;
 }
+
+// CAMERA
+typedef struct {
+	int i;
+} CameraFollowComponent;
