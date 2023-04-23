@@ -119,7 +119,7 @@ void keyboardControllerSystemAddListener(EventBus eventBus)
 }
 
 // MOVEMENT SYSTEM
-void movementSystem(Registry* registry, float deltaTime, Vector2 screenSize)
+void movementSystem(Registry* registry, float deltaTime, Vector2 screenSize, Vector2 mapSize)
 {
 	ArrayHeader* entities = systemGetEntities(SYSTEM_MOVEMENT, *registry);
 	for(int i = 0; i < entities->size; i++)
@@ -128,11 +128,17 @@ void movementSystem(Registry* registry, float deltaTime, Vector2 screenSize)
 		int entityId = arrayGetElementAtI(entities, i);
 		TransformComponent* transform = entityGetComponent(entityId, *registry, COMPONENT_TRANSFORM);
 
-		// if(transform->position.x <0 || transform->position.x > screenSize.x || transform->position.y < 0 || transform->position.y > screenSize.y)
-		// {
-		// 	entityQueueForDeletion(entityId, registry);
-		// 	continue;
-		// } 
+		if(entityHasTag(entityId, registry, TAG_PLAYER))
+		{
+			transform->position.x = min(max(transform->position.x, 0), mapSize.x);
+			transform->position.y = min(max(transform->position.y, 0), mapSize.y);
+		}
+
+		if(transform->position.x <0 || transform->position.x > mapSize.x || transform->position.y < 0 || transform->position.y > mapSize.y)
+		{
+			entityQueueForDeletion(entityId, registry);
+			continue;
+		} 
 
 		RigidBodyComponent* rigidBody = entityGetComponent(entityId, *registry, COMPONENT_RIGID_BODY);
 

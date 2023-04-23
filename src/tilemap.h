@@ -52,10 +52,44 @@ void tilemapCreate(Game* game, Vector2 scaleV)
 	}
 }
 
+#define MAX_COLS 1000   // maximum number of columns in a matrix
+
+void getMapDimensions(const char* filename, int* rows, int* cols) {
+    FILE* fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Error: cannot open file %s\n", filename);
+        return;
+    }
+
+    char line[1000];
+    *rows = 0;
+    *cols = 0;
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        // count the number of rows
+        (*rows)++;
+
+        // count the number of columns
+        int col_count = 0;
+        char* token = strtok(line, ",");
+        while (token != NULL) {
+            col_count++;
+            token = strtok(NULL, ",");
+        }
+        if (col_count > *cols) {
+            *cols = col_count;
+        }
+    }
+
+    fclose(fp);
+}
+
 void tilemapCreateInferno(Game* game, Vector2 scaleV)
 {
 	float scale = 1.;
 	int cols = 10, rows = 10;
+
+	getMapDimensions("./assets/inferno.csv", &cols, &rows);
+
 	int tilemap[rows][cols];
 
 	loadCSV("./assets/inferno.csv", rows, cols, tilemap);

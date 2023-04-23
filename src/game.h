@@ -388,7 +388,7 @@ void gameUpdate(Game* _this)
 
 	circularMovementSystem(_this->registry, _this->deltaTime);
 	animationSystem(_this->registry);
-	movementSystem(&_this->registry, _this->deltaTime, (Vector2){_this->windowWidth, _this->windowHeight});
+	movementSystem(&_this->registry, _this->deltaTime, (Vector2){_this->windowWidth, _this->windowHeight}, _this->mapSize);
 	registryUpdate(&_this->registry);
 	eventBusCleanEventListeners(_this->eventBus);
 }
