@@ -56,10 +56,7 @@ void tilemapCreate(Game* game, Vector2 scaleV)
 
 void getMapDimensions(const char* filename, int* rows, int* cols) {
     FILE* fp = fopen(filename, "r");
-    if (fp == NULL) {
-        printf("Error: cannot open file %s\n", filename);
-        return;
-    }
+	assert(fp != NULL && "Error: cannot open file");
 
     char line[1000];
     *rows = 0;
