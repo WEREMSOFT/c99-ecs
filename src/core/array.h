@@ -150,12 +150,17 @@ float arrayGetElementAtf(ArrayHeader* _this, int index)
 
 void* arrayGetElementOrCreateAt(ArrayHeader** _this, int index)
 {
+
 	if(index >= (*_this)->size)
 	{
-		void* pivot = malloc((*_this)->dataTypeSize);
-		memset(pivot, 0, (*_this)->dataTypeSize);
-		(*_this) = arrayAddElementAt(*_this, pivot, index);
-		free(pivot);
+		typedef struct 
+		{
+			char array[(*_this)->dataTypeSize];
+		} Pivot;
+
+		Pivot pivot;
+		memset(&pivot, 0, (*_this)->dataTypeSize);
+		(*_this) = arrayAddElementAt(*_this, &pivot, index);
 	}
 	return arrayGetElementAt((*_this), index);
 }
