@@ -137,15 +137,16 @@ void systemAddEntity(SystemEnum systemId, int entityId, Registry* registry)
 	 registry->entitiesPerSystem[systemId] = arrayAddElement(registry->entitiesPerSystem[systemId], &entityId);
 }
 
+static int comp(const int* elm1, const int* elm2) 
+{
+	return *elm2 - *elm1;
+}
+
 void registryUpdate(Registry* registry)
 {
 	if(!registry->isDirty) return;
 	// SORT ENTITIES TO DELETE FROM HIGH TO LOW
 	{
-		int comp(const int* elm1, const int* elm2) 
-		{
-			return *elm2 - *elm1;
-		}
 		if(registry->entitiesToDelete->size > 0)
 			qsort(registry->entitiesToDelete->data, registry->entitiesToDelete->size, registry->entitiesToDelete->dataTypeSize, comp);
 	}
@@ -175,7 +176,7 @@ void registryUpdate(Registry* registry)
 
 Registry registryAddEntityToGroup(Registry _this, int entityId, int groupId)
 {
-	_this.groups[groupId] = arrayAddElement(_this.groups[groupId], entityId);
+	_this.groups[groupId] = arrayAddElement(_this.groups[groupId], &entityId);
 	return _this;
 }
 
