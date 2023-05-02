@@ -9,7 +9,7 @@ LIBS := -lSDL2 -llua5.3 -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lm -lcimgui_sdl -l
 FLAGS_DEBUG := -g -O0 -w 
 FLAGS_DEBUG_MEM := -g -O0 -w -fsanitize=address
 FLAGS__DEBUG := -O3 -fsanitize=address
-FLAGS := -Wall -Wextra -std=c99 -Ilibs/include -Llibs
+FLAGS := -Wall -Wextra -std=gnu99 -Wpedantic -Werror -Wshadow -Ilibs/include -Llibs
 
 TARGET := bin/main.bin
 
